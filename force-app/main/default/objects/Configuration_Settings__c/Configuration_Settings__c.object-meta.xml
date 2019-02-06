@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>This configuration is used to maintain credentials and token for making a Owlin API calls</description>
+    <enableFeeds>false</enableFeeds>
+    <label>Configuration Settings</label>
+    <visibility>Protected</visibility>
+</CustomObject>
