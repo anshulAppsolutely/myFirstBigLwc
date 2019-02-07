@@ -66,7 +66,6 @@ public with sharing virtual class HttpClient {
         httpRequest.setEndpoint(this.endpoint);
         httpRequest.setMethod(this.method);
         httpRequest.setHeader('Content-Type', 'application/json');
-        httpRequest.setHeader('channel', 'Web');
         if (this.body != null) {
             httpRequest.setBody(this.body);
         }

@@ -69,11 +69,49 @@ public with sharing class OwlinEntitiesHandler {
     /**
      * get the api token to mae a call.
      *
+     * @return boolean
+     */
+    public static Boolean requestAPIToken(Configuration_Settings__c owlinConfig){
+        system.debug('getting token >>>');
+        Boolean tokenGenerated = false;
+        if(owlinConfig!=null) {
+            try {
+                HttpResponse httpResponse;
+                OwlinAPITokenRequestWrapper apiRequestWrapper = prepareAPITokenRequest(owlinConfig);
+                String body = Json.serialize(apiRequestWrapper);
+                HttpClient client = new HttpClient();
+                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'tokens';
+                client.post(endpointString, body, null);
+                httpResponse = client.getHttpResponse();
+                system.debug(' error code >>'+httpResponse.getStatusCode());
+                if(httpResponse!=null) {
+                    String jsonResponse = httpResponse.getBody();
+                    OwlinAPITokenResponseWrapper apiResponse = OwlinAPITokenResponseWrapper.parse(jsonResponse);
+                    system.debug('apiTokenResponse >>'+apiResponse);
+                    saveAPIToken(apiResponse.token);
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
+                return tokenGenerated;
+
+            }
+        }
+
+        return tokenGenerated;
+    }
+
+
+    /**
+     * prepare requesting API token
+     *
      * @return
      */
-    public static String requestAPIToken(){
-        system.debug('getting token >>>');
-        return null;
+    private static OwlinAPITokenRequestWrapper prepareAPITokenRequest(Configuration_Settings__c owlinConfig){
+        OwlinAPITokenRequestWrapper apiRequestWrapper = new OwlinAPITokenRequestWrapper();
+        apiRequestWrapper.email = owlinConfig.Email__c;
+        apiRequestWrapper.password = owlinConfig.Password__c;
+        apiRequestWrapper.expire = '30d';
+        return apiRequestWrapper;
     }
 
     /**
@@ -89,31 +127,31 @@ public with sharing class OwlinEntitiesHandler {
     /**
      * this method is used to get the configuration custom settings at runtime
      *
-     * @param requestedCustomSettingName
+     * @param owlinConfig
      *
      * @return
      */
-    public static List<Configuration_Settings__c> getRequestedConfiguration(String requestedCustomSettingName) {
+    public static List<Configuration_Settings__c> getRequestedConfiguration(String owlinConfig) {
 
-        List<Configuration_Settings__c> requestedConfigurationList;
+        List<Configuration_Settings__c> owlinConfigList;
         //String requestedCustomSettingEntry = 'PayperEmail_SandboxConfiguration';
-        if(!String.isBlank(requestedCustomSettingName)) {
-            Configuration_Settings__c requestedConfiguration = Configuration_Settings__c.getInstance(requestedCustomSettingName);
+        if(!String.isBlank(owlinConfig)) {
+            Configuration_Settings__c requestedConfiguration = Configuration_Settings__c.getInstance(owlinConfig);
             if(requestedConfiguration!=null && requestedConfiguration.Endpoint__c != null){
-                requestedConfigurationList = new List<Configuration_Settings__c>();
-                requestedConfigurationList.add(Configuration_Settings__c.getInstance(requestedCustomSettingName));
+                owlinConfigList = new List<Configuration_Settings__c>();
+                owlinConfigList.add(Configuration_Settings__c.getInstance(owlinConfig));
             }
         }
         //if its still null get the primary configuration. Only one can be primary
-        if(requestedConfigurationList == null) {
-            requestedConfigurationList = [
+        if(owlinConfigList == null) {
+            owlinConfigList = [
                     SELECT Name,ID,Endpoint__c,Is_Primary__c,Email__c,
                             Password__c,Token__c,Token_Expiry_Date__c
                     FROM Configuration_Settings__c
                     WHERE Is_Primary__c = true];
         }
 
-        return requestedConfigurationList;
+        return owlinConfigList;
     }
 
 }

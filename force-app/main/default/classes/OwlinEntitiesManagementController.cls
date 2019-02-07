@@ -71,6 +71,7 @@ public with sharing class OwlinEntitiesManagementController {
      */
     public PageReference linkAccountsToOwlin(){
         try {
+            Boolean isTokenGenerated = true;
             if (entitiesNotLinkedCount == null || entitiesNotLinkedCount == 0){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'There are no accounts to link');
                 ApexPages.addMessage(msg);
@@ -82,20 +83,26 @@ public with sharing class OwlinEntitiesManagementController {
                 return null;
             }
             //check backend configurations
-            List<Configuration_Settings__c> requestedConfigurationList = OwlinEntitiesHandler.getRequestedConfiguration(null);
-            if(requestedConfigurationList ==null || requestedConfigurationList.size() == 0){
-                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Please configure owlin data in setup');
+            List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+            if(owlinConfigList ==null || owlinConfigList.size() == 0){
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Please configure Owlin data in setup');
                 ApexPages.addMessage(msg);
                 return null;
             }
             Date today = System.Today();
             //check for valid token or expiry
             //if token is not valid get the new token first
-            if(requestedConfigurationList!=null && requestedConfigurationList.size() > 0
-                    && requestedConfigurationList[0]!= null
-                    && (requestedConfigurationList[0].Token__c == null || requestedConfigurationList[0].Token_Expiry_Date__c < today)) {
+
+            if(owlinConfigList!=null && owlinConfigList.size() > 0
+                    && owlinConfigList[0]!= null
+                    && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
                 system.debug('requesting API token from linkAccountsToOwlin');
-                OwlinEntitiesHandler.requestAPIToken();
+                isTokenGenerated = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+            }
+            if(!isTokenGenerated){
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to link entities.Token not received'));
+                return null;
+
             }
 
             //request to link accounts to owlin
