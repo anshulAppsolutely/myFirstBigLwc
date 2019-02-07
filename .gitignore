@@ -14,3 +14,7 @@ force-app/main/default/profiles/Custom%3A Support Profile.profile-meta.xml
 force-app/main/default/settings/OrgPreference.settings-meta.xml
 IlluminatedCloud/OwlinSprint1/OfflineSymbolTable.zip
 Owlin.iml
+force-app/main/default/layouts/Account-Account %28Marketing%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Sales%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Support%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account Layout.layout-meta.xml

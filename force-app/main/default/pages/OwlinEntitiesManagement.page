@@ -1,2 +1,69 @@
-<apex:page >
+<apex:page controller="OwlinEntitiesManagementController" lightningStylesheets="true" sidebar="false" showHeader="false" readOnly="true" >
+    <apex:slds />
+    <div class="slds-p-around_medium">
+        <apex:form >
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-account" title="Entities Management">
+                                <svg class='slds-icon slds-icon_small' aria-hidden='true'>
+                                    <use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href="{!URLFOR($Asset.SLDS,'assets/icons/standard-sprite/svg/symbols.svg#account')}"/>
+                                </svg>
+                                <span class="slds-assistive-text">Entities Management</span>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <a href="javascript:void(0);" class="slds-card__header-link" title="Outer Card Header">
+                                    <span>Owlin Entity Manager</span>
+                                </a>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+            </article>
+            <div>
+                <apex:pageMessages />
+                <table class="slds-table slds-table--bordered slds-table_cell-buffer">
+                    <thead>
+                    <tr class="slds-text-title">
+                        <th scope="col">
+                            <div class="slds-truncate" title="Linked Entities">Linked Entities</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Entities Requested">Entities Requested</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Entities to Link">Entities to Link</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Entities Allowed">Entities Allowed (License)</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td data-label="Linked Entities">
+                            <div class="slds-truncate" title="Linked Entities">{!likedEntitiesCount}</div>
+                        </td>
+                        <td data-label="Entities Requested">
+                            <div class="slds-truncate" title="Entities Requested">{!entitiesRequestedCount}</div>
+                        </td>
+                        <td data-label="Entities to Link">
+                            <div class="slds-truncate" title="Entities to Link">{!entitiesNotLinkedCount}</div>
+                        </td>
+                        <td data-label="Entities Allowed">
+                            <div class="slds-truncate" title="Entities Allowed">{!entitiesLicenseCount}</div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <footer class="slds-modal__footer">
+                    <apex:commandButton value="Link Entities" styleclass="slds-button slds-button--neutral" action="{!linkAccountsToOwlin}" />
+                    <!--<apex:commandButton value="Request License" styleclass="slds-button slds-button&#45;&#45;neutral" action="{!requestLicense}" />-->
+                </footer>
+            </div>
+        </apex:form>
+    </div>
 </apex:page>

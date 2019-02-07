@@ -68,7 +68,7 @@
                     </tbody>
                 </table>
             </apex:outputPanel>
-            <br></br>
+            <br/>
             <apex:outputPanel rendered="{!IF(configurations.size == 0, true,false)}">
                 
                 No Configurations are configured yet.
