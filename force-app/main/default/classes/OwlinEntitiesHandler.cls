@@ -63,7 +63,7 @@ public with sharing class OwlinEntitiesHandler {
         //call apex batch class to process records
         OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('');
         //set to maximum scope size
-        Database.executeBatch(linkEntities, 2000);
+        Database.executeBatch(linkEntities, 200);
     }
 
     /**
@@ -71,7 +71,7 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @return boolean
      */
-    public static Boolean requestAPIToken(Configuration_Settings__c owlinConfig){
+    public static Boolean requestAndSaveAPIToken(Configuration_Settings__c owlinConfig){
         system.debug('getting token >>>');
         Boolean tokenGenerated = false;
         if(owlinConfig!=null) {
@@ -83,12 +83,12 @@ public with sharing class OwlinEntitiesHandler {
                 String endpointString = 'https://' + owlinConfig.Endpoint__c + 'tokens';
                 client.post(endpointString, body, null);
                 httpResponse = client.getHttpResponse();
-                system.debug(' error code >>'+httpResponse.getStatusCode());
                 if(httpResponse!=null) {
                     String jsonResponse = httpResponse.getBody();
                     OwlinAPITokenResponseWrapper apiResponse = OwlinAPITokenResponseWrapper.parse(jsonResponse);
                     system.debug('apiTokenResponse >>'+apiResponse);
-                    saveAPIToken(apiResponse.token);
+                    saveAPIToken(apiResponse.token, owlinConfig);
+                    tokenGenerated = true;
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
@@ -96,7 +96,6 @@ public with sharing class OwlinEntitiesHandler {
 
             }
         }
-
         return tokenGenerated;
     }
 
@@ -120,8 +119,12 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @param token
      */
-    public static void saveAPIToken(String token){
-
+    public static void saveAPIToken(String token, Configuration_Settings__c owlinConfig){
+        system.debug('owlinConfig >>'+owlinConfig);
+        Date today = System.Today();
+        owlinConfig.Token__c = token;
+        owlinConfig.Token_Expiry_Date__c = today.addDays(25);
+        update owlinConfig;
     }
 
     /**
@@ -134,7 +137,6 @@ public with sharing class OwlinEntitiesHandler {
     public static List<Configuration_Settings__c> getRequestedConfiguration(String owlinConfig) {
 
         List<Configuration_Settings__c> owlinConfigList;
-        //String requestedCustomSettingEntry = 'PayperEmail_SandboxConfiguration';
         if(!String.isBlank(owlinConfig)) {
             Configuration_Settings__c requestedConfiguration = Configuration_Settings__c.getInstance(owlinConfig);
             if(requestedConfiguration!=null && requestedConfiguration.Endpoint__c != null){
@@ -150,7 +152,6 @@ public with sharing class OwlinEntitiesHandler {
                     FROM Configuration_Settings__c
                     WHERE Is_Primary__c = true];
         }
-
         return owlinConfigList;
     }
 

@@ -17,7 +17,10 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
     global Database.QueryLocator start(Database.BatchableContext BC) {
         // collect the batches of records or objects to be passed to execute
         if(String.isBlank(queryString)) {
-            queryString = 'SELECT Id,Name FROM Account where Owlin_Link_Requested__c!= true and Owlin_Entity_Id__c = null';
+            queryString = 'SELECT Id,Name,Owlin_Entity_Id__c,Owlin_Link_Requested__c ' +
+                    'FROM Account ' +
+                    'WHERE Owlin_Link_Requested__c!= true ' +
+                    'AND Owlin_Entity_Id__c = null';
         }
         return Database.getQueryLocator(queryString);
     }
@@ -30,7 +33,6 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
 
             //collection of accounts scope is defined as 200
             //create wrapper for 200 accounts to send
-
 
         } catch(Exception e) {
             errors.add(e);
