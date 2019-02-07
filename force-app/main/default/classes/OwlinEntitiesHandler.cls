@@ -48,19 +48,22 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getFeatureLicenseCount(){
-        return 2 ;
+        return 20 ;
     }
 
     /**
      * this method is used to request entities to Owlin
-     * A batch class is called to handle the request
+     * A batch class is called to handle the request to handle all accounts
      *
      * @param accountsToLink
      */
     public static void linkEntitiesToOwlin(){
+        //pass owlin config to batch
         system.debug('linking entities to owlin >>>');
         //call apex batch class to process records
-
+        OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable();
+        //set to maximum scope size
+        Database.executeBatch(linkEntities, 2000);
     }
 
     /**

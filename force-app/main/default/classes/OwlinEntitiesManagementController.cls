@@ -100,6 +100,7 @@ public with sharing class OwlinEntitiesManagementController {
 
             //request to link accounts to owlin
             OwlinEntitiesHandler.linkEntitiesToOwlin();
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Accounts sent to link'));
 
         }catch (Exception e){
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to link entities'));
