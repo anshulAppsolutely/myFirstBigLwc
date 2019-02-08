@@ -8,23 +8,27 @@ export default class AccountPresenceDashboard extends LightningElement {
 
     svgWidth = 600;
     svgHeight = 600;
-
     d3Initialized = false;
 
+    /**
+     * ensures that the page loads and renders
+     * the container before the graph is created
+     */
     renderedCallback() {
         if (this.d3Initialized) {
             return;
         }
         this.d3Initialized = true;
 
+        //load the scripts
         Promise.all([
             loadScript(this, D3 + '/d3.V5.min.js'),
             loadStyle(this, D3 + '/style.css')
-        ])
-            .then(() => {
+        ]).then(() => {
+            //initialize the graph
             this.initializeD3();
-    })
-    .catch(error => {
+        }).catch(error => {
+            //show error if problem in loading d3
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error loading D3',
@@ -32,11 +36,15 @@ export default class AccountPresenceDashboard extends LightningElement {
                     variant: 'error'
                 })
             );
-    });
+        });
     }
 
+    /**
+     * method used to initialize graph
+     */
     initializeD3() {
-        // Example adopted from https://bl.ocks.org/mbostock/2675ff61ea5e063ede2b5d63c08020c7
+
+        //get the reference container through svg
         const svg = d3.select(this.template.querySelector('svg.d3'));
         const width = this.svgWidth;
         const height = this.svgHeight;
@@ -48,9 +56,10 @@ export default class AccountPresenceDashboard extends LightningElement {
                 'link',
                 d3.forceLink().id(d => {
                     return d.id;
-    })
-    )
-    .force('charge', d3.forceManyBody())
+                })
+            )
+
+        .force('charge', d3.forceManyBody())
             .force('center', d3.forceCenter(width / 2, height / 2));
 
         const link = svg
@@ -61,8 +70,8 @@ export default class AccountPresenceDashboard extends LightningElement {
             .enter()
             .append('line')
             .attr('stroke-width', d => {
-            return Math.sqrt(d.value);
-    });
+                return Math.sqrt(d.value);
+            });
 
         const node = svg
             .append('g')
@@ -73,19 +82,23 @@ export default class AccountPresenceDashboard extends LightningElement {
             .append('circle')
             .attr('r', 5)
             .attr('fill', d => {
-            return color(d.group);
-    })
-    .call(
-            d3
+                return color(d.group);
+            })
+            .call(d3
                 .drag()
                 .on('start', dragstarted)
                 .on('drag', dragged)
                 .on('end', dragended)
-        );
+            );
 
         node.append('title').text(d => {
             return d.id;
-    });
+        });
+
+        node.on('click', function(d,i) {
+            //alert(d.links[i].source);
+
+        });
 
         simulation.nodes(DATA.nodes).on('tick', ticked);
 
