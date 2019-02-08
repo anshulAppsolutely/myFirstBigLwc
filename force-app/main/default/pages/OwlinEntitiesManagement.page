@@ -29,7 +29,7 @@
                     <thead>
                     <tr class="slds-text-title">
                         <th scope="col">
-                            <div class="slds-truncate" title="Linked Entities">Linked Entities</div>
+                            <div class="slds-truncate" title="Linked Entities">Entities Linked</div>
                         </th>
                         <th scope="col">
                             <div class="slds-truncate" title="Entities Requested">Entities Requested</div>
@@ -38,7 +38,7 @@
                             <div class="slds-truncate" title="Entities to Link">Entities to Link</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Entities Allowed">Entities Allowed (License)</div>
+                            <div class="slds-truncate" title="Entities Allowed">Entities Allowed Per License</div>
                         </th>
                     </tr>
                     </thead>

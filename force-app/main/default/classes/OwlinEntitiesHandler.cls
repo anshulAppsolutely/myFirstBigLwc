@@ -57,13 +57,14 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @param accountsToLink
      */
-    public static void linkEntitiesToOwlin(){
+    public static void linkEntitiesToOwlin(Integer limitEntitiesFilter){
         //pass owlin config to batch
         system.debug('linking entities to owlin >>>');
         //call apex batch class to process records
-        OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('');
+        OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter);
         //set to maximum scope size
         Database.executeBatch(linkEntities, 200);
+        
     }
 
     /**

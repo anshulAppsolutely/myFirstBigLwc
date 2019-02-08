@@ -103,9 +103,12 @@ public with sharing class OwlinEntitiesManagementController {
                 ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to link entities.Token not received'));
                 return null;
             }
+            //get accounts that can be linked based on license
+            //here we will always get the positive value as we checked condition
+            Integer limitEntitiesFilter = entitiesLicenseCount - likedEntitiesCount;
 
             //request to link accounts to owlin
-            OwlinEntitiesHandler.linkEntitiesToOwlin();
+            OwlinEntitiesHandler.linkEntitiesToOwlin(limitEntitiesFilter);
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Accounts sent to link'));
 
         }catch (Exception e){
