@@ -58,8 +58,7 @@ export default class AccountPresenceDashboard extends LightningElement {
                     return d.id;
                 })
             )
-
-        .force('charge', d3.forceManyBody())
+            .force('charge', d3.forceManyBody())
             .force('center', d3.forceCenter(width / 2, height / 2));
 
         const link = svg
@@ -80,7 +79,7 @@ export default class AccountPresenceDashboard extends LightningElement {
             .data(DATA.nodes)
             .enter()
             .append('circle')
-            .attr('r', 5)
+            .attr('r', 10)
             .attr('fill', d => {
                 return color(d.group);
             })
@@ -91,12 +90,13 @@ export default class AccountPresenceDashboard extends LightningElement {
                 .on('end', dragended)
             );
 
-        node.append('title').text(d => {
-            return d.id;
+        node.append('title')
+            .text(function(d) {
+                return d.id;
         });
 
         node.on('click', function(d,i) {
-            //alert(d.links[i].source);
+            alert(DATA.nodes[i].id);
 
         });
 
