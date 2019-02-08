@@ -18,3 +18,5 @@ force-app/main/default/layouts/Account-Account %28Marketing%29 Layout.layout-met
 force-app/main/default/layouts/Account-Account %28Sales%29 Layout.layout-meta.xml
 force-app/main/default/layouts/Account-Account %28Support%29 Layout.layout-meta.xml
 force-app/main/default/layouts/Account-Account Layout.layout-meta.xml
+.idea/inspectionProfiles/Project_Default.xml
+force-app/main/default/flexipages/Test_LWC.flexipage-meta.xml
