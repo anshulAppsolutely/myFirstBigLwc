@@ -1,6 +1,6 @@
 .sfdx
 .vscode
-
+.DS_Store
 .idea/encodings.xml
 .idea/illuminatedCloud.xml
 .idea/misc.xml
@@ -20,3 +20,5 @@ force-app/main/default/layouts/Account-Account %28Support%29 Layout.layout-meta.
 force-app/main/default/layouts/Account-Account Layout.layout-meta.xml
 .idea/inspectionProfiles/Project_Default.xml
 force-app/main/default/flexipages/Test_LWC.flexipage-meta.xml
+package-lock.json
+node_modules

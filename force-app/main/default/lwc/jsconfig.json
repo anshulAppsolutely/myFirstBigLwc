@@ -2,7 +2,14 @@
     "compilerOptions": {
         "experimentalDecorators": true,
         "baseUrl": ".",
-        "paths": {}
+        "paths": {
+            "c/account-presence-dashboard": [
+                "accountPresenceDashboard/accountPresenceDashboard.js"
+            ],
+            "c/d3": [
+                "../staticresources/d3/d3.js"
+            ]
+        }
     },
     "include": [
         "**/*",
