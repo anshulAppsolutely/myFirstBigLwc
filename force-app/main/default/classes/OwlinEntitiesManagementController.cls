@@ -118,5 +118,10 @@ public with sharing class OwlinEntitiesManagementController {
         }
         return null;
     }
+    
+    @AuraEnabled(cacheable=true)
+    public static List<Account> getAccountList() {
+        return [SELECT Id, Name, Owlin_Entity_Id__c FROM Account WHERE OwnerId = :UserInfo.getUserId()]; // WHERE Owlin_Entity_Id__c IS NOT NULL
+    }
 
 }
