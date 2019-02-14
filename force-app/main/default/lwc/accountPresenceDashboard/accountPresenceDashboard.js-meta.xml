@@ -13,6 +13,8 @@
       <targetConfig targets="lightning__AppPage, lightning__HomePage">
           <property name="bubbleColor" type="String" default="#1f77b4"  label="Bubble Colour"/>
           <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
+          <property name="title" type="String" default="Your Accounts: Owlin News Presence" label="Title" />
+          <property name="statKey" type="String" default="delta:month" label="Owlin Default Statistics Key" />
       </targetConfig>
   </targetConfigs>
 </LightningComponentBundle>
