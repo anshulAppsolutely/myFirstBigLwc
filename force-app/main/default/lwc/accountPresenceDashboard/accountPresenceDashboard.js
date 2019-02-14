@@ -142,7 +142,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
                 if (index > 0) return part.replace(/[^a-zA-Z0-9]/g, '').substr(0, 1) + '.';
                 else if (part.length > 12) return part.substr(0, 8) + '.';
                 return part;
-            }).join();
+            }).join(' ');
         }
 
         function getTitleRadius(radius, title, max = 30) {
