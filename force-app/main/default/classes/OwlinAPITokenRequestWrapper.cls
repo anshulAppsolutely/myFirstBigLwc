@@ -1,5 +1,5 @@
 /**
- * this class is used to generate wrapper to request callout
+ * this class is used to generate wrapper to request callout for getting API Token
  */
 
 public class OwlinAPITokenRequestWrapper {

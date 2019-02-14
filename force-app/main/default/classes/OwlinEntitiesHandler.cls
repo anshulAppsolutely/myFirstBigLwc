@@ -87,7 +87,7 @@ public with sharing class OwlinEntitiesHandler {
                 if(httpResponse!=null) {
                     String jsonResponse = httpResponse.getBody();
                     OwlinAPITokenResponseWrapper apiResponse = OwlinAPITokenResponseWrapper.parse(jsonResponse);
-                    system.debug('apiTokenResponse >>'+apiResponse);
+                    //system.debug('apiTokenResponse >>'+apiResponse);
                     saveAPIToken(apiResponse.token, owlinConfig);
                     tokenGenerated = true;
                 }
@@ -111,6 +111,25 @@ public with sharing class OwlinEntitiesHandler {
         apiRequestWrapper.email = owlinConfig.Email__c;
         apiRequestWrapper.password = owlinConfig.Password__c;
         apiRequestWrapper.expire = '30d';
+        return apiRequestWrapper;
+    }
+
+    /**
+     * prepare request to link entities to Owlin
+     *
+     * @return
+     */
+    public static OwlinLinkEntitiesRequestWrapper prepareOwlinEntityLinkRequest(List<Account> requestedAccountList){
+        OwlinLinkEntitiesRequestWrapper apiRequestWrapper = new OwlinLinkEntitiesRequestWrapper();
+        List<OwlinLinkEntitiesRequestWrapper.entities> entityList = new List<OwlinLinkEntitiesRequestWrapper.entities>();
+        for(Account entity : requestedAccountList){
+            OwlinLinkEntitiesRequestWrapper.entities entityToLink = new OwlinLinkEntitiesRequestWrapper.entities();
+            entityToLink.id = entity.Id;
+            entityToLink.domain = entity.Website;
+            entityToLink.name = entity.Name;
+            entityList.add(entityToLink);
+        }
+        apiRequestWrapper.entities = entityList;
         return apiRequestWrapper;
     }
 
