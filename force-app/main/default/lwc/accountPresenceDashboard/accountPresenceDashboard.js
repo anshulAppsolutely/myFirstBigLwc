@@ -18,13 +18,16 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     scriptsImported = false;
 
     @api
+    title;
+
+    @api
     bubbleColor;
 
     @api
     textColor;
 
     @api
-    statKey = 'delta:month';
+    statKey;
     
     @track accounts;
 
@@ -34,9 +37,6 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         if (data) {
             this.accounts = data;
             // this.outputProxy(data);
-            //initialize the graph if scripts imported
-            if (this.scriptsImported) 
-                this.bubbleChart(this);
         } else if (error) {
             this.errorToast(error.body.message);
             this.accounts = undefined;
@@ -59,8 +59,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             loadStyle(this, D3 + '/style.css')
         ]).then(() => {
             //initialize the graph if accounts created
-            if (this.accounts)
-                this.bubbleChart(this);
+            this.bubbleChart(this);
 
         }).catch(error => {
             //show error if problem in loading d3
@@ -73,7 +72,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         var container = c;
 
         var width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
-        var height = width * 0.6; // Fixed aspect
+        var height = width * 0.4; // Fixed aspect
 
         //@todo replace DATASET with live response from Owlin
         var bubble = d3.pack(DATASET)
@@ -123,7 +122,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function(d){
-                return d.r/5;
+                return getTitleRadius(d.r, getTitle(d.data));
             })
             .attr("fill", this.textColor)
         
@@ -132,14 +131,43 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
         // Get appropriate value for account (bubble size)
         function getValue(d) {
-            var statKey = 'delta:month';
-            return d.stats && d.stats[statKey] !== undefined ? d.stats[statKey].value : 0;
+            return d.stats && d.stats[container.statKey] !== undefined ? d.stats[container.statKey].value : 0;
         }
 
         // Get title for account
         function getTitle(d){
-            // d.data.title.substring(0, d.r / 3)
-            return d.title.substring(0,10);
+            var title = d.title;
+            if (title.length < 5) return title;
+            return title.split(' ').map((part, index) => {
+                if (index > 0) return part.replace(/[^a-zA-Z0-9]/g, '').substr(0, 1) + '.';
+                else if (part.length > 12) return part.substr(0, 8) + '.';
+                return part;
+            }).join(' ');
+        }
+
+        function getTitleRadius(radius, title, max = 30) {
+            const SIZES = {
+                w: 1.5,
+                m: 1.5,
+                i: 0.6,
+                l: 0.6,
+                '1': 0.7,
+                '.': 0.2,
+                ',': 0.2
+            };
+        
+            var l = 0;
+            var chr, s, i;
+            for (i = 0; i < title.length; i++) {
+                // get character
+                chr = title.substr(i, 1);
+                // get estimate of character width
+                s = SIZES[chr.toLowerCase()] || 1;
+                // uppercase is bigger
+                if (chr.toUpperCase() === chr) s = s + 0.3;
+                l = l + s;
+            }
+            return Math.min(max, (2.5 * radius) / l);
         }
     }
 
