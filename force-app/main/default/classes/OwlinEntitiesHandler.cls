@@ -87,7 +87,7 @@ public with sharing class OwlinEntitiesHandler {
                 if(httpResponse!=null) {
                     String jsonResponse = httpResponse.getBody();
                     OwlinAPITokenResponseWrapper apiResponse = OwlinAPITokenResponseWrapper.parse(jsonResponse);
-                    system.debug('apiTokenResponse >>'+apiResponse);
+                    //system.debug('apiTokenResponse >>'+apiResponse);
                     saveAPIToken(apiResponse.token, owlinConfig);
                     tokenGenerated = true;
                 }
@@ -98,6 +98,33 @@ public with sharing class OwlinEntitiesHandler {
             }
         }
         return tokenGenerated;
+    }
+
+    /**
+     * get the entity timeline response
+     *
+     * @return boolean
+     */
+    public static String getEntityTimeline(Configuration_Settings__c owlinConfig){
+        String timeLineResponse = null;
+        if(owlinConfig!=null) {
+            try {
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines?no_cache=false';
+                client.get(endpointString,owlinConfig.Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    timeLineResponse = httpResponse.getBody();
+                    system.debug('timeLineResponse >>'+timeLineResponse);
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
+                return null;
+
+            }
+        }
+        return timeLineResponse;
     }
 
 
@@ -111,6 +138,25 @@ public with sharing class OwlinEntitiesHandler {
         apiRequestWrapper.email = owlinConfig.Email__c;
         apiRequestWrapper.password = owlinConfig.Password__c;
         apiRequestWrapper.expire = '30d';
+        return apiRequestWrapper;
+    }
+
+    /**
+     * prepare request to link entities to Owlin
+     *
+     * @return
+     */
+    public static OwlinLinkEntitiesRequestWrapper prepareOwlinEntityLinkRequest(List<Account> requestedAccountList){
+        OwlinLinkEntitiesRequestWrapper apiRequestWrapper = new OwlinLinkEntitiesRequestWrapper();
+        List<OwlinLinkEntitiesRequestWrapper.entities> entityList = new List<OwlinLinkEntitiesRequestWrapper.entities>();
+        for(Account entity : requestedAccountList){
+            OwlinLinkEntitiesRequestWrapper.entities entityToLink = new OwlinLinkEntitiesRequestWrapper.entities();
+            entityToLink.id = entity.Id;
+            entityToLink.domain = entity.Website;
+            entityToLink.name = entity.Name;
+            entityList.add(entityToLink);
+        }
+        apiRequestWrapper.entities = entityList;
         return apiRequestWrapper;
     }
 

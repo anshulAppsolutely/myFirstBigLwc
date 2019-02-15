@@ -21,8 +21,9 @@ public with sharing virtual class HttpClient {
      *
      * @param endpoint
      */
-    public void get(String endpoint) {
+    public void get(String endpoint, String authorizationHeader) {
         this.setEndpoint(endpoint);
+        this.setAuthorizationHeader(authorizationHeader);
         this.get();
     }
 
