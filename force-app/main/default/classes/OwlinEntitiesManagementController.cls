@@ -120,7 +120,34 @@ public with sharing class OwlinEntitiesManagementController {
     }
     
     @AuraEnabled(cacheable=true)
-    public static List<Account> getAccountList() {
+    public static String getAccountForBubble() {
+        Boolean isTokenGenerated = true;
+        //check for any filters
+        //check backend configurations
+        List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+        if(owlinConfigList == null || owlinConfigList.size() == 0){
+            ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Please configure Owlin data in setup');
+            ApexPages.addMessage(msg);
+            return null;
+        }
+        Date today = System.Today();
+        //check for valid token or expiry
+        //if token is not valid get the new token first
+        if(owlinConfigList!=null && owlinConfigList.size() > 0
+                && owlinConfigList[0]!= null
+                && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
+            system.debug('requesting API token from linkAccountsToOwlin');
+            isTokenGenerated = OwlinEntitiesHandler.requestAndSaveAPIToken(owlinConfigList[0]);
+        }
+        if(!isTokenGenerated){
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to get Timelines.Token not received'));
+            return null;
+        }
+        return OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0]);
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Account> getUserAccountList() {
         return [SELECT Id, Name, Owlin_Entity_Id__c FROM Account WHERE OwnerId = :UserInfo.getUserId()]; // WHERE Owlin_Entity_Id__c IS NOT NULL
     }
 

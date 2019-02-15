@@ -100,6 +100,33 @@ public with sharing class OwlinEntitiesHandler {
         return tokenGenerated;
     }
 
+    /**
+     * get the entity timeline response
+     *
+     * @return boolean
+     */
+    public static String getEntityTimeline(Configuration_Settings__c owlinConfig){
+        String timeLineResponse = null;
+        if(owlinConfig!=null) {
+            try {
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines?no_cache=false';
+                client.get(endpointString,owlinConfig.Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    timeLineResponse = httpResponse.getBody();
+                    system.debug('timeLineResponse >>'+timeLineResponse);
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
+                return null;
+
+            }
+        }
+        return timeLineResponse;
+    }
+
 
     /**
      * prepare requesting API token

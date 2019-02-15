@@ -8,14 +8,14 @@ import D3 from '@salesforce/resourceUrl/d3';
 // import UserPreferencesShowTitleToExternalUsers from '@salesforce/schema/UserChangeEvent.UserPreferencesShowTitleToExternalUsers';
 import { NavigationMixin } from 'lightning/navigation';
 
-import DATASET from './account-presence-response'; 
-import getAccountList from '@salesforce/apex/OwlinEntitiesManagementController.getAccountList';
+import DATASET from './account-presence-response';
+import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
+import getUserAccountList from '@salesforce/apex/OwlinEntitiesManagementController.getUserAccountList';
 
 
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
 
     d3Initialized = false;
-    scriptsImported = false;
 
     @api
     title;
@@ -28,11 +28,11 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
     @api
     statKey;
-    
+
     @track accounts;
 
     /** Get accounts from Apex */
-    @wire(getAccountList)
+    @wire(getUserAccountList)
     wiredAccounts({ error, data }) {
         if (data) {
             this.accounts = data;
@@ -41,6 +41,19 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             this.errorToast(error.body.message);
             this.accounts = undefined;
         }
+    }
+
+    /** Get accounts from Apex */
+    @wire(getAccountForBubble)
+    wiredBubbleResponse({ error, data }) {
+        console.log('1 executed >'+data);
+        /*if (data) {
+            this.accounts = data;
+            // this.outputProxy(data);
+        } else if (error) {
+            this.errorToast(error.body.message);
+            this.accounts = undefined;
+        }*/
     }
 
     /**
@@ -56,8 +69,9 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         //load the scripts
         Promise.all([
             loadScript(this, D3 + '/d3.V5.min.js'),
-            loadStyle(this, D3 + '/style.css')
+            loadStyle(this, D3 + '/style.css'),
         ]).then(() => {
+            console.log('2 executed >'+this.accounts);
             //initialize the graph if accounts created
             this.bubbleChart(this);
 
