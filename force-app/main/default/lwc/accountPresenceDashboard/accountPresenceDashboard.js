@@ -8,10 +8,8 @@ import D3 from '@salesforce/resourceUrl/d3';
 // import UserPreferencesShowTitleToExternalUsers from '@salesforce/schema/UserChangeEvent.UserPreferencesShowTitleToExternalUsers';
 import { NavigationMixin } from 'lightning/navigation';
 
-import DATASET from './account-presence-response';
+import DATASET from './account-presence-response'; //@todo remove
 import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
-import getUserAccountList from '@salesforce/apex/OwlinEntitiesManagementController.getUserAccountList';
-
 
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
 
@@ -30,18 +28,6 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     statKey;
 
     @track accounts;
-
-    /** Get accounts from Apex */
-    @wire(getUserAccountList)
-    wiredAccounts({ error, data }) {
-        if (data) {
-            this.accounts = data;
-            // this.outputProxy(data);
-        } else if (error) {
-            this.errorToast(error.body.message);
-            this.accounts = undefined;
-        }
-    }
 
     /** Get accounts from Apex */
     @wire(getAccountForBubble)
@@ -82,30 +68,43 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     }
 
     bubbleChart(c) {
+        var width, height, tooltip, bubble, svg, nodes, node;
         // bind container object for reference
         var container = c;
 
-        var width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
-        var height = width * 0.4; // Fixed aspect
+        width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
+        height = width * (400/width); // Fixed aspect
+
+        tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style("color", "white")
+        .style("padding", "8px")
+        .style("background-color", "rgba(0, 0, 0, 0.75)")
+        .style("border-radius", "6px")
+        .style("font", "12px sans-serif")
+        .text("tooltip");
 
         //@todo replace DATASET with live response from Owlin
-        var bubble = d3.pack(DATASET)
+        bubble = d3.pack(DATASET)
             .size([width, height]);
 
         // Add SVG to render bubble chart
-        var svg = d3.select(this.template.querySelector('div.d3'))
+        svg = d3.select(this.template.querySelector('div.d3'))
             .append('svg')
             .attr("width", width)
             .attr("height", height)
 
         // Build nodes
-        var nodes = d3.hierarchy(DATASET)
+        nodes = d3.hierarchy(DATASET)
             .sum(function(d) {
                 return getValue(d);
             });
 
         // For each node, populate with bubble
-        var node = svg.selectAll(".node")
+        node = svg.selectAll(".node")
             .data(bubble(nodes).descendants())
             .enter()
             .filter(function(d){
@@ -138,10 +137,20 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             .attr("font-size", function(d){
                 return getTitleRadius(d.r, getTitle(d.data));
             })
-            .attr("fill", this.textColor)
+            .attr("fill", this.textColor);
         
         // Handle click on node
         node.on('click', function (d) {container.navigateToAccount(d.data.key)});
+
+        // Populate tooltip with title text
+        node.on("mouseover", function(d) {
+            tooltip.text(d.data.title);
+            tooltip.style("visibility", "visible");
+            })
+            .on("mousemove", function() {
+                return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+            })
+            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
         // Get appropriate value for account (bubble size)
         function getValue(d) {
