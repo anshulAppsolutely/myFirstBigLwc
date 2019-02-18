@@ -2,14 +2,12 @@ import { LightningElement, api, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import D3 from '@salesforce/resourceUrl/d3';
-// import DATA from './data';
-// import Selector from '@salesforce/schema/EmailDomainKey.Selector';
-// import { getFieldValue } from 'lightning/uiRecordApi';
-// import UserPreferencesShowTitleToExternalUsers from '@salesforce/schema/UserChangeEvent.UserPreferencesShowTitleToExternalUsers';
 import { NavigationMixin } from 'lightning/navigation';
-
-//import DATASET from './account-presence-response';
 import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
+
+// Labels
+import Error_Title from '@salesforce/label/c.Error_Title';
+import Error_NoData from '@salesforce/label/c.Error_NoData';
 
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
 
@@ -28,17 +26,26 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     statKey;
 
     @track accounts;
-    DATASET;
+    bubbleData;
+
+    @track
+    displayD3 = true;
+    
+    @track
+    loading = true;
+
+    label = {
+        Error_Title,
+        Error_NoData,
+    };
 
     /** Get accounts from Apex */
     @wire(getAccountForBubble)
     wiredBubbleResponse({ error, data }) {
-        console.log('1 executed >')
         if (data) {
             this.accounts = data.accounts;
-            this.DATASET = {children: JSON.parse(data.values)};
+            this.bubbleData = {children: JSON.parse(data.values)};
             this.bubbleChart(this);
-            // this.outputProxy(data);
         } else if (error) {
             this.errorToast(error.message);
             this.accounts = undefined;
@@ -60,10 +67,8 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             loadScript(this, D3 + '/d3.V5.min.js'),
             loadStyle(this, D3 + '/style.css'),
         ]).then(() => {
-            console.log('2 executed >'+this.DATASET);
             //initialize the graph if accounts created
             this.bubbleChart(this);
-
         }).catch(error => {
             //show error if problem in loading d3
             this.errorToast(error.message);
@@ -72,25 +77,18 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
     bubbleChart(c) {
         var width, height, tooltip, bubble, svg, nodes, node;
-        var i, found;
+        
         // bind container object for reference
         var container = c;
 
-        if(!this.DATASET || !d3 || this.DATASET.children.length < 1) return;
-
-        found = false;
-        for (i = 0; i < this.DATASET.children.length; i ++) {
-            if (this.DATASET.children[i].stats[this.statKey]) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            d3.select(this.template.querySelector('div.d3-error')).attr('class', 'd3-error slds-text-color_error slds-m-around_medium');
+        if(!this.bubbleData || !d3) return;
+        
+        this.loading = false;
+        if(this.bubbleData.children.length < 1 || bubblesToDisplay(this.bubbleData, this.statKey) < 1){
+            this.displayD3 = false;
             return;
-        }
-
-        d3.select(this.template.querySelector('div.d3-error')).attr('class', 'd3-error slds-hide');
+        } 
+        this.displayD3 = true;
 
         width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
         height = width * (400/width); // Fixed aspect
@@ -107,8 +105,8 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         .style("font", "12px sans-serif")
         .text("tooltip");
 
-        //@todo replace DATASET with live response from Owlin
-        bubble = d3.pack(this.DATASET)
+        //@todo replace bubbleData with live response from Owlin
+        bubble = d3.pack(this.bubbleData)
             .size([width, height]);
 
         // Add SVG to render bubble chart
@@ -118,7 +116,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             .attr("height", height)
 
         // Build nodes
-        nodes = d3.hierarchy(this.DATASET)
+        nodes = d3.hierarchy(this.bubbleData)
             .sum(function(d) {
                 return getValue(d);
             });
@@ -135,11 +133,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             .attr("transform", function(d) {
                 return "translate(" + (d.x ? d.x : 0) + "," + (d.y ? d.y : 0) + ")";
             });
-        
-        node.append("title")
-            .text(function(d) {
-                return d.data.title;
-            });
+
 
         node.append("circle")
             .attr("r", function(d) {
@@ -168,7 +162,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             tooltip.style("visibility", "visible");
             })
             .on("mousemove", function() {
-                return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+                return tooltip.style("top", (d3.event.pageY-30)+"px").style("left",(d3.event.pageX+10)+"px");
             })
             .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
@@ -212,6 +206,17 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             }
             return Math.min(max, (2.5 * radius) / l);
         }
+
+        function bubblesToDisplay(bubbleData, statKey) {
+            var i;
+            var toDisplay = 0;
+            for (i = 0; i < bubbleData.children.length; i ++) {
+                if (bubbleData.children[i].stats[statKey] && bubbleData.children[i].stats[statKey].value > 0) {
+                    toDisplay++;
+                }
+            }
+            return toDisplay;
+        }
     }
 
     // Find matching account by entity ID and navigate.
@@ -235,123 +240,14 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
     /** 
      * Show error toast with message 
-     * @todo labels
      */ 
     errorToast(message) {
         this.dispatchEvent(
             new ShowToastEvent({
-                title: 'Error',
+                title: this.label.Error_Title,
                 message: message,
                 variant: 'error'
             })
         );
     }
-
-    /** this is just a helper method for development. */
-    outputProxy(record) {
-        var obj = {};
-        for(var propt in record) {
-            obj[propt] = record[propt];
-            if (typeof(record[propt]) == 'object') {
-                obj[propt] = this.outputProxy(record[propt]);
-            }
-        }
-        console.log(obj);
-        return obj;
-    }
-
-    /**
-     * method used to initialize graph (old chart - to delete)
-     */
-    /*initializeD3() {
-
-        //get the reference container through svg
-        const svg = d3.select(this.template.querySelector('svg.d3'));
-        const width = this.svgWidth;
-        const height = this.svgHeight;
-        const color = d3.scaleOrdinal(d3.schemeDark2);
-
-        const simulation = d3
-            .forceSimulation()
-            .force(
-                'link',
-                d3.forceLink().id(d => {
-                    return d.id;
-                })
-            )
-            .force('charge', d3.forceManyBody())
-            .force('center', d3.forceCenter(width / 2, height / 2));
-
-        const link = svg
-            .append('g')
-            .attr('class', 'links')
-            .selectAll('line')
-            .data(DATA.links)
-            .enter()
-            .append('line')
-            .attr('stroke-width', d => {
-                return Math.sqrt(d.value);
-            });
-
-        const node = svg
-            .append('g')
-            .attr('class', 'nodes')
-            .selectAll('circle')
-            .data(DATA.nodes)
-            .enter()
-            .append('circle')
-            .attr('r', 10)
-            .attr('fill', d => {
-                return color(d.group);
-            })
-            .call(d3
-                .drag()
-                .on('start', dragstarted)
-                .on('drag', dragged)
-                .on('end', dragended)
-            );
-
-        node.append('title')
-            .text(function(d) {
-                return d.id;
-        });
-
-        node.on('click', function(d,i) {
-            alert(DATA.nodes[i].id);
-
-        });
-
-        simulation.nodes(DATA.nodes).on('tick', ticked);
-
-        simulation.force('link').links(DATA.links);
-
-        function ticked() {
-            link.attr('x1', d => d.source.x)
-        .attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x)
-        .attr('y2', d => d.target.y);
-            node.attr('cx', d => d.x).attr('cy', d => d.y);
-        }
-
-        function dragstarted(d) {
-            if (!d3.event.active) {
-                simulation.alphaTarget(0.3).restart();
-            }
-            d.fx = d.x;
-            d.fy = d.y;
-        }
-
-        function dragged(d) {
-            d.fx = d3.event.x;
-            d.fy = d3.event.y;
-        }
-
-        function dragended(d) {
-            if (!d3.event.active) {
-                simulation.alphaTarget(0);
-            }
-            d.fx = null;
-            d.fy = null;
-        }
-    } */
 }

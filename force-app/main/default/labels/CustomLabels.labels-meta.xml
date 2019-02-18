@@ -22,6 +22,13 @@
         <value>Cannot link more entities. Please request more license</value>
     </labels>
     <labels>
+        <fullName>Error_NoData</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error_NoData</shortDescription>
+        <value>There is no data available for this period.</value>
+    </labels>
+    <labels>
         <fullName>Error_NoEntitiesToLink</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -34,6 +41,13 @@
         <protected>true</protected>
         <shortDescription>Error_NoOwlinConfig</shortDescription>
         <value>Please configure Owlin data in setup</value>
+    </labels>
+    <labels>
+        <fullName>Error_Title</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Title</shortDescription>
+        <value>Error</value>
     </labels>
     <labels>
         <fullName>Success_EntitiesLinked</fullName>

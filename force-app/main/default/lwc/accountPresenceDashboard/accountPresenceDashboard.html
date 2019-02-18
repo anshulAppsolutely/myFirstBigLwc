@@ -1,6 +1,11 @@
 <template>
     <lightning-card title={title}>
         <div class="d3" lwc:dom="manual"></div>
-        <div class="d3-error slds-hide">No data available for this period.</div>
+        <template if:false={displayD3}>
+            <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
+        </template>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
     </lightning-card>
 </template>
