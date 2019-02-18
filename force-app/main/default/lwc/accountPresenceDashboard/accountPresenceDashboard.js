@@ -8,7 +8,7 @@ import D3 from '@salesforce/resourceUrl/d3';
 // import UserPreferencesShowTitleToExternalUsers from '@salesforce/schema/UserChangeEvent.UserPreferencesShowTitleToExternalUsers';
 import { NavigationMixin } from 'lightning/navigation';
 
-import DATASET from './account-presence-response'; //@todo remove
+//import DATASET from './account-presence-response';
 import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
 
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
@@ -28,18 +28,21 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     statKey;
 
     @track accounts;
+    DATASET;
 
     /** Get accounts from Apex */
     @wire(getAccountForBubble)
     wiredBubbleResponse({ error, data }) {
-        console.log('1 executed >'+data);
-        /*if (data) {
-            this.accounts = data;
+        console.log('1 executed >')
+        if (data) {
+            console.log(JSON.parse(data));
+            this.DATASET = {children: JSON.parse(data)};
+            this.bubbleChart(this);
             // this.outputProxy(data);
         } else if (error) {
-            this.errorToast(error.body.message);
+            this.errorToast(error.message);
             this.accounts = undefined;
-        }*/
+        }
     }
 
     /**
@@ -57,7 +60,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             loadScript(this, D3 + '/d3.V5.min.js'),
             loadStyle(this, D3 + '/style.css'),
         ]).then(() => {
-            console.log('2 executed >'+this.accounts);
+            console.log('2 executed >'+this.DATASET);
             //initialize the graph if accounts created
             this.bubbleChart(this);
 
@@ -69,8 +72,25 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
     bubbleChart(c) {
         var width, height, tooltip, bubble, svg, nodes, node;
+        var i, found;
         // bind container object for reference
         var container = c;
+
+        if(!this.DATASET || !d3 || this.DATASET.children.length < 1) return;
+
+        found = false;
+        for (i = 0; i < this.DATASET.children.length; i ++) {
+            if (this.DATASET.children[i].stats[this.statKey]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            d3.select(this.template.querySelector('div.d3-error')).attr('class', 'd3-error slds-text-color_error slds-m-around_medium');
+            return;
+        }
+
+        d3.select(this.template.querySelector('div.d3-error')).attr('class', 'd3-error slds-hide');
 
         width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
         height = width * (400/width); // Fixed aspect
@@ -88,7 +108,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         .text("tooltip");
 
         //@todo replace DATASET with live response from Owlin
-        bubble = d3.pack(DATASET)
+        bubble = d3.pack(this.DATASET)
             .size([width, height]);
 
         // Add SVG to render bubble chart
@@ -98,7 +118,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             .attr("height", height)
 
         // Build nodes
-        nodes = d3.hierarchy(DATASET)
+        nodes = d3.hierarchy(this.DATASET)
             .sum(function(d) {
                 return getValue(d);
             });
@@ -113,7 +133,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             .append("g")
             .attr("class", "node")
             .attr("transform", function(d) {
-                return "translate(" + d.x + "," + d.y + ")";
+                return "translate(" + (d.x ? d.x : 0) + "," + (d.y ? d.y : 0) + ")";
             });
         
         node.append("title")
@@ -123,7 +143,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
 
         node.append("circle")
             .attr("r", function(d) {
-                return d.r;
+                return (d.r ? d.r : 0);
             })
             .style("fill", this.bubbleColor);
 
