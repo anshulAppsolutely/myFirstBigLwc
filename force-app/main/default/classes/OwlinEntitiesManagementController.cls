@@ -22,7 +22,7 @@ public with sharing class OwlinEntitiesManagementController {
             }
             return likedEntitiesCount;
         }
-        private set;
+        set;
     }
 
     public Integer entitiesNotLinkedCount
@@ -34,7 +34,7 @@ public with sharing class OwlinEntitiesManagementController {
             }
             return entitiesNotLinkedCount;
         }
-        private set;
+        set;
     }
 
     public Integer entitiesRequestedCount
@@ -46,7 +46,7 @@ public with sharing class OwlinEntitiesManagementController {
             }
             return entitiesRequestedCount;
         }
-        private set;
+        set;
     }
 
     public Integer entitiesLicenseCount
@@ -58,7 +58,7 @@ public with sharing class OwlinEntitiesManagementController {
             }
             return entitiesLicenseCount;
         }
-        private set;
+        set;
     }
 
     public void requestLicense(){
@@ -154,6 +154,7 @@ public with sharing class OwlinEntitiesManagementController {
             system.debug('requesting API token from linkAccountsToOwlin');
             token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
         }
+
         if (token == null) {
             AuraHandledException noAccessException = new AuraHandledException(Label.Error_APITokenError);
             noAccessException.setMessage(Label.Error_APITokenError);
