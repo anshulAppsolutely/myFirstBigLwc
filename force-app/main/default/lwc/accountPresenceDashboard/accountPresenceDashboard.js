@@ -35,8 +35,8 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     wiredBubbleResponse({ error, data }) {
         console.log('1 executed >')
         if (data) {
-            console.log(JSON.parse(data));
-            this.DATASET = {children: JSON.parse(data)};
+            this.accounts = data.accounts;
+            this.DATASET = {children: JSON.parse(data.values)};
             this.bubbleChart(this);
             // this.outputProxy(data);
         } else if (error) {

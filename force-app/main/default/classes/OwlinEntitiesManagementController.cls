@@ -128,9 +128,9 @@ public with sharing class OwlinEntitiesManagementController {
     }
     
     @AuraEnabled(cacheable=true)
-    public static Map<List<Account>, String> getAccountForBubble() {
+    public static Map<String, Object> getAccountForBubble() {
         String token;
-        Map<List<Account>, String> response = new Map<List<Account>, String>();
+        Map<String, Object> response = new Map<String, Object>();
         //check for any filters
         //check backend configurations
         List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
@@ -179,7 +179,8 @@ public with sharing class OwlinEntitiesManagementController {
             FROM Account 
             WHERE (OwnerId =: UserInfo.getUserId() OR Id IN : sharedAccountIds) 
             AND Owlin_Entity_Id__c!=null ORDER BY CreatedDate DESC];
-            response.put(ownerAccount,timelineResponse);
+            response.put('accounts', ownerAccount);
+            response.put('values', timelineResponse);
             
         }catch(Exception e){
             AuraHandledException noAccessException = new AuraHandledException(Label.Error);
