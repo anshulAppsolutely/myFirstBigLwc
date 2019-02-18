@@ -12,5 +12,3 @@ private class OwlinLinkEntitiesRequestWrapper_Test {
     }
 
 }
-
-{ "matches": [ { "score": 18, "title": "Vodafone India Ltd", "filter_id": "acfb5d84-d838-447a-938d-58480bc1c54d", "original_id": "0019E00000uB55lQAC" }, { "score": 14, "title": "HEMbrug", "filter_id": "9b682ae6-4b10-43c8-a408-ac2323a481b2", "original_id": "0019E00000tvpjNQAQ" } ], "base_filter_library_size": 2929 }
