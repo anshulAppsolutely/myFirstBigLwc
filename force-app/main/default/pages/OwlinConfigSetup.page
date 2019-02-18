@@ -131,7 +131,7 @@
                             </div>
                             <footer class="slds-modal__footer">
                                 <apex:commandButton immediate="true" rendered="{!NOT(ISBLANK(editingRow))}" value="Cancel" styleclass="slds-button slds-button_neutral cancel_config" action="{!cancelConfig}" />
-                                <apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)))}" value="Clone" styleclass="slds-button slds-button_neutral" action="{!cloneConfig}" />
+                                <!--<apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)))}" value="Clone" styleclass="slds-button slds-button_neutral" action="{!cloneConfig}" /> -->
                                 <apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)),configurations.size > 1)}" value="Delete" styleclass="slds-button slds-button_neutral" action="{!deleteConfig}" />
                                 <apex:commandButton rendered="{!NOT(ISBLANK(editingRow))}" value="Save" styleclass="slds-button slds-button_brand new_config" action="{!saveConfig}" />
                             </footer>

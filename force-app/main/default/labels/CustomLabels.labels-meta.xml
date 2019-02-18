@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Error</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error</shortDescription>
+        <value>Request Failed. Please try after sometime or contact admin</value>
+    </labels>
+    <labels>
+        <fullName>Error_APITokenError</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_APITokenError</shortDescription>
+        <value>Request Failed.Token not received</value>
+    </labels>
+    <labels>
+        <fullName>Error_EntitiesLicense</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_EntitiesLicense</shortDescription>
+        <value>Cannot link more entities. Please request more license</value>
+    </labels>
+    <labels>
+        <fullName>Error_NoEntitiesToLink</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_NoEntitiesToLink</shortDescription>
+        <value>There are no accounts to link</value>
+    </labels>
+    <labels>
+        <fullName>Error_NoOwlinConfig</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_NoOwlinConfig</shortDescription>
+        <value>Please configure Owlin data in setup</value>
+    </labels>
+    <labels>
+        <fullName>Success_EntitiesLinked</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success_EntitiesLinked</shortDescription>
+        <value>Accounts Sent to Link to Owlin</value>
+    </labels>
+</CustomLabels>

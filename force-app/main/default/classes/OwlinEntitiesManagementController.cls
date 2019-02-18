@@ -72,47 +72,55 @@ public with sharing class OwlinEntitiesManagementController {
      */
     public PageReference linkAccountsToOwlin(){
         try {
-            Boolean isTokenGenerated = true;
+            String token = null;
             if (entitiesNotLinkedCount == null || entitiesNotLinkedCount == 0){
-                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'There are no accounts to link');
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_NoEntitiesToLink);
                 ApexPages.addMessage(msg);
                 return null;
             }
             if (likedEntitiesCount >= entitiesLicenseCount) {
-                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Cannot link more entities. Please request more license');
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_EntitiesLicense);
                 ApexPages.addMessage(msg);
                 return null;
             }
             //check backend configurations
             List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
             if(owlinConfigList == null || owlinConfigList.size() == 0){
-                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Please configure Owlin data in setup');
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_NoOwlinConfig);
                 ApexPages.addMessage(msg);
                 return null;
             }
             Date today = System.Today();
+            if(owlinConfigList!=null && owlinConfigList.size() > 0
+                    && owlinConfigList[0]!= null
+                    && owlinConfigList[0].Token__c != null
+                    && owlinConfigList[0].Token_Expiry_Date__c > today){
+                token = owlinConfigList[0].Token__c;
+            }
             //check for valid token or expiry
             //if token is not valid get the new token first
             if(owlinConfigList!=null && owlinConfigList.size() > 0
                     && owlinConfigList[0]!= null
                     && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
                 system.debug('requesting API token from linkAccountsToOwlin');
-                isTokenGenerated = OwlinEntitiesHandler.requestAndSaveAPIToken(owlinConfigList[0]);
+                token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+                OwlinEntitiesHandler.saveAPIToken(token);
             }
-            if(!isTokenGenerated){
-                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to link entities.Token not received'));
+            if(token == null){
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_APITokenError));
                 return null;
             }
+            system.debug('token received >>>'+token);
             //get accounts that can be linked based on license
             //here we will always get the positive value as we checked condition
             Integer limitEntitiesFilter = entitiesLicenseCount - likedEntitiesCount;
 
             //request to link accounts to owlin
-            OwlinEntitiesHandler.linkEntitiesToOwlin(limitEntitiesFilter);
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Accounts sent to link'));
+            OwlinEntitiesHandler.linkEntitiesToOwlin(limitEntitiesFilter, token);
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, Label.Success_EntitiesLinked));
 
         }catch (Exception e){
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to link entities'));
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error));
             system.debug('Unable to link entities '+e.getMessage());
             return null;
         }
@@ -120,30 +128,65 @@ public with sharing class OwlinEntitiesManagementController {
     }
     
     @AuraEnabled(cacheable=true)
-    public static String getAccountForBubble() {
-        Boolean isTokenGenerated = true;
+    public static Map<List<Account>, String> getAccountForBubble() {
+        String token;
+        Map<List<Account>, String> response = new Map<List<Account>, String>();
         //check for any filters
         //check backend configurations
         List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
-        if(owlinConfigList == null || owlinConfigList.size() == 0){
-            ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Please configure Owlin data in setup');
-            ApexPages.addMessage(msg);
-            return null;
+        if (owlinConfigList == null || owlinConfigList.size() == 0) {
+            AuraHandledException noAccessException = new AuraHandledException(Label.Error_NoOwlinConfig);
+            noAccessException.setMessage(Label.Error_NoOwlinConfig);
+            throw noAccessException;
         }
         Date today = System.Today();
+        if (owlinConfigList != null && owlinConfigList.size() > 0
+                && owlinConfigList[0] != null
+                && owlinConfigList[0].Token__c != null
+                && owlinConfigList[0].Token_Expiry_Date__c > today) {
+            token = owlinConfigList[0].Token__c;
+        }
         //check for valid token or expiry
         //if token is not valid get the new token first
-        if(owlinConfigList!=null && owlinConfigList.size() > 0
-                && owlinConfigList[0]!= null
+        if (owlinConfigList != null && owlinConfigList.size() > 0
+                && owlinConfigList[0] != null
                 && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
             system.debug('requesting API token from linkAccountsToOwlin');
-            isTokenGenerated = OwlinEntitiesHandler.requestAndSaveAPIToken(owlinConfigList[0]);
+            token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
         }
-        if(!isTokenGenerated){
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Unable to get Timelines.Token not received'));
-            return null;
+        if (token == null) {
+            AuraHandledException noAccessException = new AuraHandledException(Label.Error_APITokenError);
+            noAccessException.setMessage(Label.Error_APITokenError);
+            throw noAccessException;
         }
-        return OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0]);
+        try{
+            String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
+            OwlinEntitiesHandler.saveAPIToken(token);
+            Set<String> sharedAccountIds = new Set<String>();
+            List<String> userOrGroupIds = new List<String>();
+            //get all the groups user is member of
+            for (GroupMember gm : [SELECT Id, group.id, group.name, group.type FROM GroupMember where UserOrGroupId = :UserInfo.getUserId()]){
+                userOrGroupIds.add(gm.group.id);
+            }
+            //add current user in the group of ids
+            userOrGroupIds.add(UserInfo.getUserId());
+            //check in share object if any account has been shared to loggedin user
+            for(AccountShare s : [SELECT AccountId,  UserOrGroupId FROM AccountShare WHERE UserOrGroupId =: userOrGroupIds ]){
+                sharedAccountIds.add(s.AccountId);
+            }
+            List<Account> ownerAccount = [SELECT 
+                    Id, Name, Owlin_Entity_Id__c 
+            FROM Account 
+            WHERE (OwnerId =: UserInfo.getUserId() OR Id IN : sharedAccountIds) 
+            AND Owlin_Entity_Id__c!=null ORDER BY CreatedDate DESC];
+            response.put(ownerAccount,timelineResponse);
+            
+        }catch(Exception e){
+            AuraHandledException noAccessException = new AuraHandledException(Label.Error);
+            noAccessException.setMessage(Label.Error);
+            throw noAccessException;
+        }
+        return response;
     }
 
     @AuraEnabled(cacheable=true)
