@@ -97,72 +97,22 @@ private class OwlinEntitiesManagementController_Test {
         Test.stopTest();
     }
 
-    @isTest
-    static void testNoEntitiesToLink(){
-        //create custom setting test data
-        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
-
-        Configuration_Settings__c configProd = new Configuration_Settings__c();
-        configProd.Name = 'Test_Owlin';
-        configProd.Email__c = 'test@test.com';
-        configProd.Endpoint__c = 'api.test.owlin/v1/';
-        configProd.Password__c = 'testPassword';
-        configProd.Token__c = 'testToken';
-        configProd.Token_Expiry_Date__c = System.Today().addDays(2);
-        configProd.Is_Primary__c = True;
-        toInsertCustomSettingRecList.add(configProd);
-
-        insert toInsertCustomSettingRecList;
-        OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
-        Test.startTest();
-        controller.entitiesNotLinkedCount = 0;
-        controller.linkAccountsToOwlin();
-        ApexPages.Message[] pageMessages = ApexPages.getMessages();
-        System.assertNotEquals(0, pageMessages.size());
-
-        // Check that the error message you are expecting is in pageMessages
-        Boolean messageFound = false;
-        for(ApexPages.Message message : pageMessages) {
-            if(message.getSeverity() == ApexPages.Severity.Error) {
-                messageFound = true;
-                System.assertEquals(Label.Error_NoEntitiesToLink, message.getSummary());
-            }
-        }
-
-        System.assert(messageFound);
-        Test.stopTest();
-    }
-
-    @isTest
-    static void testNoConfigException() {
-
-        Test.startTest();
-        try{
-            OwlinEntitiesManagementController.getAccountForBubble();
-        }
-        catch (Exception e)
-        {
-            System.assertEquals(Label.Error_NoOwlinConfig, e.getMessage());
-        }
-        Test.stopTest();
-    }
 
     @isTest
     static void testTokenException() {
         //create custom setting test data
+        Test.startTest();
         list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
-
         Configuration_Settings__c configProd = new Configuration_Settings__c();
         configProd.Name = 'Test_Owlin';
         configProd.Email__c = 'test@test.com';
         configProd.Endpoint__c = 'api.test.owlin/v1/';
         configProd.Password__c = 'testPassword';
-        configProd.Is_Primary__c = True;
+        configProd.Is_Primary__c = true;
         toInsertCustomSettingRecList.add(configProd);
-
-        Test.startTest();
+        insert toInsertCustomSettingRecList;
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(700));
         try{
-            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(700));
             OwlinEntitiesManagementController.getAccountForBubble();
         }
         catch (Exception e)

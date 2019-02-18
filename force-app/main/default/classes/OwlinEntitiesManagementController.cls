@@ -148,13 +148,19 @@ public with sharing class OwlinEntitiesManagementController {
         }
         //check for valid token or expiry
         //if token is not valid get the new token first
-        if (owlinConfigList != null && owlinConfigList.size() > 0
-                && owlinConfigList[0] != null
-                && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
-            system.debug('requesting API token from linkAccountsToOwlin');
-            token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+        try {
+            if (owlinConfigList != null && owlinConfigList.size() > 0
+                    && owlinConfigList[0] != null
+                    && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
+                system.debug('requesting API token from linkAccountsToOwlin');
+                token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+            }
+        }catch(Exception e){
+            AuraHandledException noAccessException = new AuraHandledException(Label.Error_APITokenError);
+            noAccessException.setMessage(Label.Error_APITokenError);
+            throw noAccessException;
+            
         }
-
         if (token == null) {
             AuraHandledException noAccessException = new AuraHandledException(Label.Error_APITokenError);
             noAccessException.setMessage(Label.Error_APITokenError);
