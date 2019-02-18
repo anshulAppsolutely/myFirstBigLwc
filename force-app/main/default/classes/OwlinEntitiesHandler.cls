@@ -64,7 +64,7 @@ public with sharing class OwlinEntitiesHandler {
         OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter);
         //set to maximum scope size
         Database.executeBatch(linkEntities, 200);
-        
+
     }
 
     /**
@@ -109,19 +109,44 @@ public with sharing class OwlinEntitiesHandler {
         String timeLineResponse = null;
         if(owlinConfig!=null) {
             try {
+                //get all owlin entity that are required
+                Set<String> keys = new Set<String>();
+                Set<String> sharedAccountIds = new Set<String>();
+
+                List<String> userOrGroupIds = new List<String>();
+                //get all the groups user is member of
+                for (GroupMember gm : [SELECT Id, group.id, group.name, group.type FROM GroupMember where UserOrGroupId = :UserInfo.getUserId()]){
+                    userOrGroupIds.add(gm.group.id);
+                }
+                //add current user in the group of ids
+                userOrGroupIds.add(UserInfo.getUserId());
+                //check in share object if any account has been shared to loggedin user
+                for(AccountShare s : [SELECT AccountId,  UserOrGroupId FROM AccountShare WHERE UserOrGroupId =: userOrGroupIds ]){
+                    sharedAccountIds.add(s.AccountId);
+                }
+
+                //query all records for loggedin user as ownwer and accounts which were shared to it
+                for(Account account : [SELECT
+                        Id, Name, Owlin_Entity_Id__c FROM Account WHERE (OwnerId =: UserInfo.getUserId() OR Id IN : sharedAccountIds) AND Owlin_Entity_Id__c!=null]){
+                    keys.add(account.Owlin_Entity_Id__c);
+                }
+                Map<String, Set<String>> jsonMap = new Map<String, Set<String>>();
+                jsonMap.put('keys',keys);
+                String inputJson = JSON.serialize(jsonMap);
+                system.debug('input json >>>'+inputJson);
+
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
-                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines?no_cache=false';
-                client.get(endpointString,owlinConfig.Token__c);
+                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines';
+                client.post(endpointString,inputJson, owlinConfig.Token__c);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
                     timeLineResponse = httpResponse.getBody();
                     system.debug('timeLineResponse >>'+timeLineResponse);
                 }
             } catch (Exception e) {
-                System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
+                System.debug(LoggingLevel.DEBUG, '***** Error:while getting entity timeline ' + e.getMessage());
                 return null;
-
             }
         }
         return timeLineResponse;

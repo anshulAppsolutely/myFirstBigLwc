@@ -150,5 +150,4 @@ public with sharing class OwlinEntitiesManagementController {
     public static List<Account> getUserAccountList() {
         return [SELECT Id, Name, Owlin_Entity_Id__c FROM Account WHERE OwnerId = :UserInfo.getUserId()]; // WHERE Owlin_Entity_Id__c IS NOT NULL
     }
-
 }

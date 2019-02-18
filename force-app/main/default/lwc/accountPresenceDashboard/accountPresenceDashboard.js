@@ -8,7 +8,7 @@ import D3 from '@salesforce/resourceUrl/d3';
 // import UserPreferencesShowTitleToExternalUsers from '@salesforce/schema/UserChangeEvent.UserPreferencesShowTitleToExternalUsers';
 import { NavigationMixin } from 'lightning/navigation';
 
-import DATASET from './account-presence-response';
+//import DATASET from './account-presence-response';
 import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
 import getUserAccountList from '@salesforce/apex/OwlinEntitiesManagementController.getUserAccountList';
 
@@ -30,6 +30,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     statKey;
 
     @track accounts;
+    DATASET = [];
 
     /** Get accounts from Apex */
     @wire(getUserAccountList)
@@ -47,13 +48,14 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     @wire(getAccountForBubble)
     wiredBubbleResponse({ error, data }) {
         console.log('1 executed >'+data);
-        /*if (data) {
-            this.accounts = data;
+        if (data) {
+            this.DATASET.push(data);
+            this.bubbleChart(this);
             // this.outputProxy(data);
         } else if (error) {
             this.errorToast(error.body.message);
             this.accounts = undefined;
-        }*/
+        }
     }
 
     /**
@@ -71,9 +73,8 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             loadScript(this, D3 + '/d3.V5.min.js'),
             loadStyle(this, D3 + '/style.css'),
         ]).then(() => {
-            console.log('2 executed >'+this.accounts);
+            console.log('2 executed >'+this.DATASET);
             //initialize the graph if accounts created
-            this.bubbleChart(this);
 
         }).catch(error => {
             //show error if problem in loading d3
@@ -108,9 +109,6 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         var node = svg.selectAll(".node")
             .data(bubble(nodes).descendants())
             .enter()
-            .filter(function(d){
-                return  !d.children
-            })
             .append("g")
             .attr("class", "node")
             .attr("transform", function(d) {
