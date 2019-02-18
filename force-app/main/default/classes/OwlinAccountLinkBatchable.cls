@@ -7,13 +7,16 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
     Exception[] errors = new Exception[0];
     List<Configuration_Settings__c> owlinConfiguration;
     String queryString='';
+    String token;
     Integer limitFilter;
 
-    public OwlinAccountLinkBatchable(String query, Integer limitEntitiesFilter){
+    public OwlinAccountLinkBatchable(String query, Integer limitEntitiesFilter, String tokenString){
         //get the primary configuration
-        owlinConfiguration = OwlinEntitiesHandler.getRequestedConfiguration(null);
-        queryString=query;
-        limitFilter = limitEntitiesFilter;
+        this.owlinConfiguration = OwlinEntitiesHandler.getRequestedConfiguration(null);
+        this.token = tokenString;
+        //system.debug('tokenString received >>'+tokenString);
+        this.queryString=query;
+        this.limitFilter = limitEntitiesFilter;
     }
 
     global Database.QueryLocator start(Database.BatchableContext BC) {
@@ -35,8 +38,11 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
 
     global void execute(Database.BatchableContext BC, List<Account> accList) {
 
-        system.debug('accList size >>'+accList.size());
+        system.debug('accList size >>'+accList.size()+ 'token >>'+token);
         if(accList.size() > 0) {
+            for(Account accountRequested : accList){
+                accountRequested.Owlin_Link_Requested__c = true;
+            }
             //for updating with owlin entity id
             Map<Id, Account> accountRequestedToLinkMap = new Map<Id, Account>(accList);
             try {
@@ -52,7 +58,7 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
                         system.debug('body >>'+body);
                         HttpClient client = new HttpClient();
                         String endpointString = 'https://' + owlinConfiguration[0].Endpoint__c + 'filters/suggest';
-                        client.post(endpointString, body, owlinConfiguration[0].Token__c);
+                        client.post(endpointString, body, token!=null ? token:owlinConfiguration[0].Token__c);
                         httpResponse = client.getHttpResponse();
                         if (httpResponse != null) {
                             String jsonResponse = httpResponse.getBody();
@@ -61,7 +67,6 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
                             for(OwlinLinkEntitiesResponseWrapper.matches owlinEntity : apiResponse.matches){
                                 Id accountId = Id.valueOf(owlinEntity.original_id);
                                 if(accountRequestedToLinkMap.containsKey(accountId)){
-                                    accountRequestedToLinkMap.get(accountId).Owlin_Link_Requested__c = true;
                                     accountRequestedToLinkMap.get(accountId).Owlin_Entity_Id__c = owlinEntity.filter_id;
                                 }
                             }

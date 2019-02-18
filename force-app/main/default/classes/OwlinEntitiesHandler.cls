@@ -57,11 +57,11 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @param accountsToLink
      */
-    public static void linkEntitiesToOwlin(Integer limitEntitiesFilter){
+    public static void linkEntitiesToOwlin(Integer limitEntitiesFilter, String tokenString){
         //pass owlin config to batch
         system.debug('linking entities to owlin >>>');
         //call apex batch class to process records
-        OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter);
+        OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter, tokenString);
         //set to maximum scope size
         Database.executeBatch(linkEntities, 200);
 
@@ -70,11 +70,11 @@ public with sharing class OwlinEntitiesHandler {
     /**
      * get the api token to mae a call.
      *
-     * @return boolean
+     * @return String token
      */
-    public static Boolean requestAndSaveAPIToken(Configuration_Settings__c owlinConfig){
+    public static String requestAPIToken(Configuration_Settings__c owlinConfig){
         system.debug('getting token >>>');
-        Boolean tokenGenerated = false;
+        String token = null;
         if(owlinConfig!=null) {
             try {
                 HttpResponse httpResponse;
@@ -88,16 +88,15 @@ public with sharing class OwlinEntitiesHandler {
                     String jsonResponse = httpResponse.getBody();
                     OwlinAPITokenResponseWrapper apiResponse = OwlinAPITokenResponseWrapper.parse(jsonResponse);
                     //system.debug('apiTokenResponse >>'+apiResponse);
-                    saveAPIToken(apiResponse.token, owlinConfig);
-                    tokenGenerated = true;
+                    token = apiResponse.token;
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while Requesting API token ' + e.getMessage());
-                return tokenGenerated;
+                return null;
 
             }
         }
-        return tokenGenerated;
+        return token;
     }
 
     /**
@@ -105,7 +104,7 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @return boolean
      */
-    public static String getEntityTimeline(Configuration_Settings__c owlinConfig){
+    public static String getEntityTimeline(final Configuration_Settings__c owlinConfig, String token){
         String timeLineResponse = null;
         if(owlinConfig!=null) {
             try {
@@ -138,7 +137,7 @@ public with sharing class OwlinEntitiesHandler {
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
                 String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines';
-                client.post(endpointString,inputJson, owlinConfig.Token__c);
+                client.post(endpointString,inputJson, token!=null ? token: owlinConfig.Token__c);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
                     timeLineResponse = httpResponse.getBody();
@@ -191,12 +190,14 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @param token
      */
-    public static void saveAPIToken(String token, Configuration_Settings__c owlinConfig){
-        system.debug('owlinConfig >>'+owlinConfig);
+    @future
+    public static void saveAPIToken(String token){
+        List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+        system.debug('owlinConfig >>'+owlinConfigList[0]);
         Date today = System.Today();
-        owlinConfig.Token__c = token;
-        owlinConfig.Token_Expiry_Date__c = today.addDays(25);
-        update owlinConfig;
+        owlinConfigList[0].Token__c = token;
+        owlinConfigList[0].Token_Expiry_Date__c = today.addDays(25);
+        update owlinConfigList[0];
     }
 
     /**
