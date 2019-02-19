@@ -46,8 +46,7 @@ private class OwlinDMLManager_Test {
             test.stopTest();
             System.assertNotEquals(null, hasAccess);
             System.assertEquals(true, hasAccess);
-        }
-        
+        }       
     }
     
     @isTest
@@ -72,8 +71,7 @@ private class OwlinDMLManager_Test {
             test.stopTest();
             System.assertNotEquals(null, hasAccess);
             System.assertEquals(true, hasAccess);
-        }
-        
+        }      
     }
 
  	@isTest
@@ -85,8 +83,7 @@ private class OwlinDMLManager_Test {
             test.stopTest();
             System.assertNotEquals(null, hasAccess);
             System.assertEquals(true, hasAccess);
-        }
-        
+        }        
     }
 
 }
