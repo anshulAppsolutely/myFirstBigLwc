@@ -7,15 +7,6 @@
 public with sharing class OwlinEntitiesHandler {
 
     /**
-     * get all accounts in the org which are linked to owlin or not
-     *
-     * @return
-     */
-    public static List<Account> getAllEnities(){
-        return [Select Id, Owlin_Entity_Id__c, Owlin_Link_Requested__c, Name, Owner.name from Account] ;
-    }
-
-    /**
      * get all accounts in the org which are linked to owlin
      *
      * @return
@@ -130,7 +121,7 @@ public with sharing class OwlinEntitiesHandler {
                 for(Account account : [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Owlin_Entity_Id__c!=null
-                ORDER BY CreatedDate DESC]){
+                ORDER BY CreatedDate DESC LIMIT 100]){
                     keys.add(account.Owlin_Entity_Id__c);
                 }
                 Map<String, Set<String>> jsonMap = new Map<String, Set<String>>();

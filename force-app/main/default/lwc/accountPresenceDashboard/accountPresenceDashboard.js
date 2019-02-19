@@ -105,7 +105,6 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
         .style("font", "12px sans-serif")
         .text("tooltip");
 
-        //@todo replace bubbleData with live response from Owlin
         bubble = d3.pack(this.bubbleData)
             .size([width, height]);
 
