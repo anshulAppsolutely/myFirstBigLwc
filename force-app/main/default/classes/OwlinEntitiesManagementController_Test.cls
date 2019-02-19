@@ -61,6 +61,45 @@ private class OwlinEntitiesManagementController_Test {
     }
 
     @isTest
+    static void testRequestAPIToken(){
+        //create custom setting test data
+        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+
+        Configuration_Settings__c configProd = new Configuration_Settings__c();
+        configProd.Name = 'Test_Owlin';
+        configProd.Email__c = 'test@test.com';
+        configProd.Endpoint__c = 'api.test.owlin/v1/';
+        configProd.Password__c = 'testPassword';
+        configProd.Token__c = 'testToken';
+        configProd.Token_Expiry_Date__c = System.Today().addDays(-2);
+        configProd.Is_Primary__c = True;
+        toInsertCustomSettingRecList.add(configProd);
+
+        insert toInsertCustomSettingRecList;
+
+        OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
+        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'apiToken'));
+            controller.linkAccountsToOwlin();
+            ApexPages.Message[] pageMessages = ApexPages.getMessages();
+            System.assertNotEquals(0, pageMessages.size());
+
+            // Check that the error message you are expecting is in pageMessages
+            Boolean messageFound = false;
+            for (ApexPages.Message message : pageMessages) {
+                if (message.getSeverity() == ApexPages.Severity.INFO) {
+                    messageFound = true;
+                    //System.assertEquals(Label.Success_EntitiesLinked, message.getSummary());
+                }
+            }
+
+            //System.assert(messageFound);
+            Test.stopTest();
+        }
+    }
+
+    @isTest
     static void testEntitiesToLink(){
         //create custom setting test data
         list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
@@ -78,47 +117,89 @@ private class OwlinEntitiesManagementController_Test {
         insert toInsertCustomSettingRecList;
 
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200));
-        controller.linkAccountsToOwlin();
-        ApexPages.Message[] pageMessages = ApexPages.getMessages();
-        System.assertNotEquals(0, pageMessages.size());
+        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'linkEntity'));
+            controller.linkAccountsToOwlin();
+            ApexPages.Message[] pageMessages = ApexPages.getMessages();
+            System.assertNotEquals(0, pageMessages.size());
 
-        // Check that the error message you are expecting is in pageMessages
-        Boolean messageFound = false;
-        for(ApexPages.Message message : pageMessages) {
-            if(message.getSeverity() == ApexPages.Severity.INFO) {
-                messageFound = true;
-                System.assertEquals(Label.Success_EntitiesLinked, message.getSummary());
+            // Check that the error message you are expecting is in pageMessages
+            Boolean messageFound = false;
+            for (ApexPages.Message message : pageMessages) {
+                if (message.getSeverity() == ApexPages.Severity.INFO) {
+                    messageFound = true;
+                    System.assertEquals(Label.Success_EntitiesLinked, message.getSummary());
+                }
             }
-        }
 
-        System.assert(messageFound);
-        Test.stopTest();
+            System.assert(messageFound);
+            Test.stopTest();
+        }
     }
 
 
     @isTest
     static void testTokenException() {
         //create custom setting test data
+        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+            Test.startTest();
+            list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+            Configuration_Settings__c configProd = new Configuration_Settings__c();
+            configProd.Name = 'Test_Owlin';
+            configProd.Email__c = 'test@test.com';
+            configProd.Endpoint__c = 'api.test.owlin/v1/';
+            configProd.Password__c = 'testPassword';
+            configProd.Is_Primary__c = true;
+            toInsertCustomSettingRecList.add(configProd);
+            insert toInsertCustomSettingRecList;
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(700,null));
+            try {
+                OwlinEntitiesManagementController.getAccountForBubble();
+            } catch (Exception e) {
+                System.assertEquals(Label.Error_APITokenError, e.getMessage());
+            }
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void testNoConfigException() {
+
         Test.startTest();
-        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
-        Configuration_Settings__c configProd = new Configuration_Settings__c();
-        configProd.Name = 'Test_Owlin';
-        configProd.Email__c = 'test@test.com';
-        configProd.Endpoint__c = 'api.test.owlin/v1/';
-        configProd.Password__c = 'testPassword';
-        configProd.Is_Primary__c = true;
-        toInsertCustomSettingRecList.add(configProd);
-        insert toInsertCustomSettingRecList;
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(700));
         try{
             OwlinEntitiesManagementController.getAccountForBubble();
         }
         catch (Exception e)
         {
-            System.assertEquals(Label.Error_APITokenError, e.getMessage());
+            System.assertEquals(Label.Error_NoOwlinConfig, e.getMessage());
         }
         Test.stopTest();
+    }
+
+    @isTest
+    static void testAccountBubble() {
+        //create custom setting test data
+        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+            Test.startTest();
+            list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+            Configuration_Settings__c configProd = new Configuration_Settings__c();
+            configProd.Name = 'Test_Owlin';
+            configProd.Email__c = 'test@test.com';
+            configProd.Endpoint__c = 'api.test.owlin/v1/';
+            configProd.Password__c = 'testPassword';
+            configProd.Is_Primary__c = true;
+            configProd.Token__c = 'testToken';
+            configProd.Token_Expiry_Date__c = System.Today().addDays(2);
+            toInsertCustomSettingRecList.add(configProd);
+            insert toInsertCustomSettingRecList;
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,null));
+            try {
+                OwlinEntitiesManagementController.getAccountForBubble();
+            } catch (Exception e) {
+
+            }
+            Test.stopTest();
+        }
     }
 }

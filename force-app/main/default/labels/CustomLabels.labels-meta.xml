@@ -50,6 +50,13 @@
         <value>Error</value>
     </labels>
     <labels>
+        <fullName>Owlin_Permission_Error</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Owlin Permission Error</shortDescription>
+        <value>User does not have permission. Please contact system administrator</value>
+    </labels>
+    <labels>
         <fullName>Success_EntitiesLinked</fullName>
         <language>en_US</language>
         <protected>true</protected>

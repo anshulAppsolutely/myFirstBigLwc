@@ -69,6 +69,7 @@ public with sharing class OwlinEntitiesHandler {
 
     /**
      * get the api token to mae a call.
+     * admin will going to call it
      *
      * @return String token
      */
@@ -110,7 +111,8 @@ public with sharing class OwlinEntitiesHandler {
             try {
                 //get all owlin entity that are required
                 Set<String> keys = new Set<String>();
-                Set<String> sharedAccountIds = new Set<String>();
+                // method is called from a with sharing context and will send records to which user has access too.
+                /*Set<String> sharedAccountIds = new Set<String>();
 
                 List<String> userOrGroupIds = new List<String>();
                 //get all the groups user is member of
@@ -122,11 +124,13 @@ public with sharing class OwlinEntitiesHandler {
                 //check in share object if any account has been shared to loggedin user
                 for(AccountShare s : [SELECT AccountId,  UserOrGroupId FROM AccountShare WHERE UserOrGroupId =: userOrGroupIds ]){
                     sharedAccountIds.add(s.AccountId);
-                }
+                }*/
 
-                //query all records for loggedin user as ownwer and accounts which were shared to it
+                //query all accounts which were shared/accessible to it
                 for(Account account : [SELECT
-                        Id, Name, Owlin_Entity_Id__c FROM Account WHERE (OwnerId =: UserInfo.getUserId() OR Id IN : sharedAccountIds) AND Owlin_Entity_Id__c!=null]){
+                        Id, Name, Owlin_Entity_Id__c
+                FROM Account WHERE Owlin_Entity_Id__c!=null
+                ORDER BY CreatedDate DESC]){
                     keys.add(account.Owlin_Entity_Id__c);
                 }
                 Map<String, Set<String>> jsonMap = new Map<String, Set<String>>();

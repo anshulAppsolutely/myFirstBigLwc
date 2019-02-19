@@ -39,7 +39,7 @@ private class OwlinAccountLinkBatchable_Test {
     static void linkEntitiesTest(){
         
         Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200));
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'linkEntity'));
         OwlinAccountLinkBatchable linkOwlinBatch = new OwlinAccountLinkBatchable('',2,null);
         database.executeBatch(linkOwlinBatch, 200);
         Test.stopTest();

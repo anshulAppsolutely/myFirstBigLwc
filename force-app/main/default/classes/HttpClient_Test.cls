@@ -12,7 +12,7 @@ private class HttpClient_Test {
         String method = 'POST';
         String body = 'THE BODY';
         String authorizationHeader = 'AUTHORIZATION';
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(400));
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(400,null));
         httpClient = new HttpClient();
         System.assert(httpClient != null);
 
@@ -35,7 +35,7 @@ private class HttpClient_Test {
         String authorizationHeader = 'AUTHORIZATION';
         httpClient = new HttpClient();
         System.assert(httpClient != null);
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200));
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,null));
 
         Test.startTest();
         httpClient.get(endpoint,authorizationHeader);
