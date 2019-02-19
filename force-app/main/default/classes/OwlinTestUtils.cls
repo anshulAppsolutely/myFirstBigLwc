@@ -35,9 +35,9 @@ public class OwlinTestUtils {
     private static User createUser(String profileName) {
         User u = usersByProfileName.get(profileName);
         if (u == null) {
-            System.runAs(getSystemAdminUserNotInserted()) {
             u = createUniqueUser(profileName);
             usersByProfileName.put(profileName, u);
+            System.runAs(getSystemAdminUserNotInserted()) {
                 insert u;
             }
         }
@@ -47,7 +47,7 @@ public class OwlinTestUtils {
     private static User createUniqueUser(String profileName) {
         Double d = math.random() * SIZE;
         Integer randomInt = d.intValue();
-        Profile p = [SELECT Id FROM Profile WHERE Name = 'Standard User'];
+        Profile p = [SELECT Id FROM Profile WHERE Name =: profileName];
         User u = new User(Alias = 'standt', Email='standarduser@testorg.com',
                 EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
                 LocaleSidKey='en_US', ProfileId = p.Id,
