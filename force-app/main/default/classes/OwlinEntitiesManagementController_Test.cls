@@ -78,7 +78,7 @@ private class OwlinEntitiesManagementController_Test {
         insert toInsertCustomSettingRecList;
 
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             Test.startTest();
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'apiToken'));
             controller.linkAccountsToOwlin();
@@ -117,7 +117,7 @@ private class OwlinEntitiesManagementController_Test {
         insert toInsertCustomSettingRecList;
 
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             Test.startTest();
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'linkEntity'));
             controller.linkAccountsToOwlin();
@@ -142,7 +142,7 @@ private class OwlinEntitiesManagementController_Test {
     @isTest
     static void testTokenException() {
         //create custom setting test data
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             Test.startTest();
             list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
             Configuration_Settings__c configProd = new Configuration_Settings__c();
@@ -180,7 +180,7 @@ private class OwlinEntitiesManagementController_Test {
     @isTest
     static void testAccountBubble() {
         //create custom setting test data
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             Test.startTest();
             list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
             Configuration_Settings__c configProd = new Configuration_Settings__c();

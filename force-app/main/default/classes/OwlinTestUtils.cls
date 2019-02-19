@@ -90,6 +90,14 @@ public class OwlinTestUtils {
         return owlinAdminUser;
     }
 
+    public static User getOwlinUserWithPermission() {
+        User userWithPermissionsUsr = createUser('Standard User');
+        System.runAs(getSystemAdminUser()) {
+            giveUserPermissionSet('Owlin_Permission_Set', userWithPermissionsUsr);
+        }
+        return userWithPermissionsUsr;
+    }
+
     private static User getSystemAdminUserNotInserted() {
         return createUniqueUser('System Administrator');
     }

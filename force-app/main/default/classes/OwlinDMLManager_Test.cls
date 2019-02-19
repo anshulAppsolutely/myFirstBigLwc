@@ -40,7 +40,7 @@ private class OwlinDMLManager_Test {
     @isTest
     static void checkValidCreateTest()
     {
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             test.startTest();
             Boolean hasAccess = OwlinDMLManager.checkAccess(accessCreateMap);
             test.stopTest();
@@ -52,7 +52,7 @@ private class OwlinDMLManager_Test {
     @isTest
     static void checkValidReadTest()
     {
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             test.startTest();
             Boolean hasAccess = OwlinDMLManager.checkAccess(accessReadMap);
             test.stopTest();
@@ -65,7 +65,7 @@ private class OwlinDMLManager_Test {
     @isTest
     static void checkValidDeleteTest()
     {
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             test.startTest();
             Boolean hasAccess = OwlinDMLManager.checkAccess(accessDeleteMap);
             test.stopTest();
@@ -77,7 +77,7 @@ private class OwlinDMLManager_Test {
  	@isTest
     static void checkValidUpdateTest()
     {
-        system.runAs(OwlinTestUtils.getOwlinStandardUser()) {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
             test.startTest();
             Boolean hasAccess = OwlinDMLManager.checkAccess(accessUpdateMap);
             test.stopTest();
