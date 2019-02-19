@@ -33,12 +33,6 @@ private class OwlinEntitiesHandler_Test {
     }
 
     @isTest
-    static void testEntitiesCount(){
-        List<Account> account = OwlinEntitiesHandler.getAllEnities();
-        System.assertEquals(4, account.size());
-    }
-
-    @isTest
     static void entitiesLinkCount(){
         Integer count = OwlinEntitiesHandler.getLinkedEnities();
         System.assertEquals(1, count);
