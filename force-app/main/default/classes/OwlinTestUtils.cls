@@ -35,9 +35,9 @@ public class OwlinTestUtils {
     private static User createUser(String profileName) {
         User u = usersByProfileName.get(profileName);
         if (u == null) {
+            System.runAs(getSystemAdminUserNotInserted()) {
             u = createUniqueUser(profileName);
             usersByProfileName.put(profileName, u);
-            System.runAs(getSystemAdminUserNotInserted()) {
                 insert u;
             }
         }
