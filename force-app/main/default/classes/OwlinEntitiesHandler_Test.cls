@@ -18,13 +18,13 @@ private class OwlinEntitiesHandler_Test {
     Account acc3 = new Account();
     acc3.Name = 'Test 13';
     acc3.Website = 'test13.com';
-    acc3.Owlin_Link_Requested__c = true;
+    acc3.Owlin_Entity_Requested_Id__c = 'abc123';
     accountList.add(acc3);
 
     Account acc4 = new Account();
     acc4.Name = 'Test 12';
     acc4.Website = 'test12.com';
-    acc4.Owlin_Link_Requested__c = true;
+    acc4.Owlin_Entity_Requested_Id__c = 'abc234';
     acc4.Owlin_Entity_Id__c = '1234';
     accountList.add(acc4);
 

@@ -5,7 +5,7 @@ private class OwlinDMLManager_Test {
 
             'Account' => new Map<String, List<String>> {
                     'Create' => new List<String> {
-                            'Owlin_Entity_Id__c', 'Owlin_Link_Requested__c', 'Name'
+                            'Owlin_Entity_Id__c', 'Owlin_Entity_Requested_Id__c', 'Name'
                     }
             }
     };
@@ -14,7 +14,7 @@ private class OwlinDMLManager_Test {
 
             'Account' => new Map<String, List<String>> {
                     'Delete' => new List<String> {
-                            'Owlin_Entity_Id__c', 'Owlin_Link_Requested__c', 'Name'
+                            'Owlin_Entity_Id__c', 'Owlin_Entity_Requested_Id__c', 'Name'
                     }
             }
     };
@@ -23,7 +23,7 @@ private class OwlinDMLManager_Test {
 
             'Account' => new Map<String, List<String>> {
                     'Update' => new List<String> {
-                            'Owlin_Entity_Id__c', 'Owlin_Link_Requested__c', 'Name'
+                            'Owlin_Entity_Id__c', 'Owlin_Entity_Requested_Id__c', 'Name'
                     }
             }
     };
@@ -32,7 +32,7 @@ private class OwlinDMLManager_Test {
 
             'Account' => new Map<String, List<String>> {
                     'Read' => new List<String> {
-                            'Owlin_Entity_Id__c', 'Owlin_Link_Requested__c', 'Name'
+                            'Owlin_Entity_Id__c', 'Owlin_Entity_Requested_Id__c', 'Name'
                     }
             }
     };

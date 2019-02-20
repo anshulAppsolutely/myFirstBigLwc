@@ -12,7 +12,7 @@ public with sharing class OwlinEntitiesManagementController {
 
             'Account' => new Map<String, List<String>> {
                     'Read' => new List<String> {
-                            'Owlin_Entity_Id__c', 'Owlin_Link_Requested__c', 'Name'
+                            'Owlin_Entity_Id__c', 'Owlin_Entity_Requested_Id__c', 'Name'
                     }
             }
     };

@@ -43,8 +43,8 @@ private class OwlinAccountLinkBatchable_Test {
         OwlinAccountLinkBatchable linkOwlinBatch = new OwlinAccountLinkBatchable('',2,null);
         database.executeBatch(linkOwlinBatch, 200);
         Test.stopTest();
-        list<Account> account = [Select id, Owlin_Link_Requested__c from Account limit 5];
-        System.assertEquals(true, account[0].Owlin_Link_Requested__c);
+        list<Account> account = [Select id, Owlin_Entity_Requested_Id__c from Account limit 5];
+        System.assert(account[0].Owlin_Entity_Requested_Id__c!=null);
     }
 
 }

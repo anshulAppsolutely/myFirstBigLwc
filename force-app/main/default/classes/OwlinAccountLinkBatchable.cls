@@ -22,14 +22,14 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
     global Database.QueryLocator start(Database.BatchableContext BC) {
         // collect the batches of records or objects to be passed to execute
         if(String.isBlank(queryString)) {
-            String queryFilter = 'WHERE Owlin_Link_Requested__c != true ' +
+            String queryFilter = 'WHERE Owlin_Entity_Requested_Id__c != \''+ BC.getJobId() +'\' '+
                     'AND Owlin_Entity_Id__c = null ' +
                     'AND Website != null ' +
                     'ORDER BY CreatedDate DESC';
             if(limitFilter!=null && limitFilter > 0){
                 queryFilter += ' limit '+limitFilter;
             }
-            queryString = 'SELECT Id,Name,Website,Owlin_Entity_Id__c,Owlin_Link_Requested__c ' +
+            queryString = 'SELECT Id,Name,Website,Owlin_Entity_Id__c,Owlin_Entity_Requested_Id__c ' +
                     'FROM Account '+queryFilter;
             System.debug('query >>'+queryString);
         }
@@ -41,7 +41,7 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
         system.debug('accList size >>'+accList.size()+ 'token >>'+token);
         if(accList.size() > 0) {
             for(Account accountRequested : accList){
-                accountRequested.Owlin_Link_Requested__c = true;
+                accountRequested.Owlin_Entity_Requested_Id__c = BC.getJobId();
             }
             //for updating with owlin entity id
             Map<Id, Account> accountRequestedToLinkMap = new Map<Id, Account>(accList);

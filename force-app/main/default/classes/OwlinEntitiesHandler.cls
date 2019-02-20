@@ -21,7 +21,7 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getNotLinkedEnities(){
-        return [Select Count() from Account where website!=null and Owlin_Link_Requested__c!= true and Owlin_Entity_Id__c = null] ;
+        return [Select Count() from Account where website!=null and Owlin_Entity_Requested_Id__c = null and Owlin_Entity_Id__c = null] ;
     }
 
     /**
@@ -30,7 +30,7 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getRequestedEnities(){
-        return [Select Count() from Account where Owlin_Link_Requested__c = true and Owlin_Entity_Id__c = null] ;
+        return [Select Count() from Account where Owlin_Entity_Requested_Id__c!=null and Owlin_Entity_Id__c = null] ;
     }
 
     /**
