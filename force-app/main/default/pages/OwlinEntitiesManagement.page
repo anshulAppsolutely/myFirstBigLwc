@@ -29,16 +29,16 @@
                     <thead>
                     <tr class="slds-text-title">
                         <th scope="col">
-                            <div class="slds-truncate" title="Linked Entities">Entities Linked</div>
+                            <div class="slds-truncate" title="Linked Entities">{!$Label.Linked_Entities_Count}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Entities Requested">Entities Requested</div>
+                            <div class="slds-truncate" title="Entities Requested">{!$Label.Entities_Requested_Count}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Entities to Link">Entities to Link</div>
+                            <div class="slds-truncate" title="Entities to Link">{!$Label.Entities_to_Link_Count}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Entities Allowed">Entities Allowed Per License</div>
+                            <div class="slds-truncate" title="Entities Allowed">{!$Label.Entities_Allowed_Per_License_Count}</div>
                         </th>
                     </tr>
                     </thead>
@@ -60,8 +60,9 @@
                     </tbody>
                 </table>
                 <footer class="slds-modal__footer">
-                    <apex:commandButton value="Link Entities" styleclass="slds-button slds-button--neutral" action="{!linkAccountsToOwlin}" />
-                    <!--<apex:commandButton value="Request License" styleclass="slds-button slds-button&#45;&#45;neutral" action="{!requestLicense}" />-->
+                    <apex:commandButton value="{!$Label.Link_Entities_to_Owlin}" styleclass="slds-button slds-button--neutral" action="{!linkAccountsToOwlin}" />
+                    <apex:variable var="url" value="{!$Label.Increase_Entity_Limit}" />
+    				<apex:outputlink styleClass="btn slds-button slds-button--neutral" value="{!MID(url, FIND('|', url) + 1, LEN(url))}" target="_blank">{!LEFT(url,(FIND('|', url)-1))}</apex:outputlink>
                 </footer>
             </div>
         </apex:form>

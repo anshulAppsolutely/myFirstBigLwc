@@ -69,11 +69,6 @@ public with sharing class OwlinEntitiesManagementController {
         set;
     }
 
-    public void requestLicense(){
-        //create a case ?
-
-    }
-
     /**
      * method used to send data to owlin to request to a future method to make API request
      * only primary will be updated

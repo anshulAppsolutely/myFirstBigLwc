@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Entities_Allowed_Per_License_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities Allowed Per License Count</shortDescription>
+        <value>Entities Allowed Per License</value>
+    </labels>
+    <labels>
+        <fullName>Entities_Requested_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities Requested Count</shortDescription>
+        <value>Entities Requested</value>
+    </labels>
+    <labels>
+        <fullName>Entities_to_Link_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities to Link Count</shortDescription>
+        <value>Entities to Link</value>
+    </labels>
+    <labels>
         <fullName>Error</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -48,6 +69,27 @@
         <protected>false</protected>
         <shortDescription>Error Title</shortDescription>
         <value>Error</value>
+    </labels>
+    <labels>
+        <fullName>Increase_Entity_Limit</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Increase Entity Limit</shortDescription>
+        <value>Increase Limit | https://www.owlin.com/</value>
+    </labels>
+    <labels>
+        <fullName>Link_Entities_to_Owlin</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link Entities to Owlin</shortDescription>
+        <value>Link Entities</value>
+    </labels>
+    <labels>
+        <fullName>Linked_Entities_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Linked Entities Count</shortDescription>
+        <value>Entities Linked</value>
     </labels>
     <labels>
         <fullName>Owlin_Permission_Error</fullName>
