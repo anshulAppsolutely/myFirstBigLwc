@@ -76,6 +76,7 @@ public with sharing class OwlinEntitiesManagementController {
     public PageReference linkAccountsToOwlin(){
         try {
             String token = null;
+            Integer limitEntitiesFilter = entitiesLicenseCount - likedEntitiesCount;
             if (entitiesNotLinkedCount == null || entitiesNotLinkedCount == 0){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_NoEntitiesToLink);
                 ApexPages.addMessage(msg);
@@ -85,6 +86,12 @@ public with sharing class OwlinEntitiesManagementController {
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_EntitiesLicense);
                 ApexPages.addMessage(msg);
                 return null;
+            }
+            //total entities to request again on clicking link as batch id will get change>>
+            Integer totalEntitiesToRequest = entitiesNotLinkedCount + entitiesRequestedCount;
+            if(totalEntitiesToRequest >= entitiesLicenseCount){
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.WARNING, Label.Warning_MoreEntitiesRequested);
+                ApexPages.addMessage(msg);
             }
             //check backend configurations
             List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
@@ -116,7 +123,6 @@ public with sharing class OwlinEntitiesManagementController {
             system.debug('token received >>>'+token);
             //get accounts that can be linked based on license
             //here we will always get the positive value as we checked condition
-            Integer limitEntitiesFilter = entitiesLicenseCount - likedEntitiesCount;
 
             //request to link accounts to owlin
             OwlinEntitiesHandler.linkEntitiesToOwlin(limitEntitiesFilter, token);

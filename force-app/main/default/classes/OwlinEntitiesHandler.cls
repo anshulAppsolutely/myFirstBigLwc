@@ -39,7 +39,7 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getFeatureLicenseCount(){
-        return 20 ;
+        return 5 ;
     }
 
     /**

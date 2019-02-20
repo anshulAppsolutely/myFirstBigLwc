@@ -105,4 +105,11 @@
         <shortDescription>Success_EntitiesLinked</shortDescription>
         <value>Accounts Sent to Link to Owlin</value>
     </labels>
+    <labels>
+        <fullName>Warning_MoreEntitiesRequested</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning_MoreEntitiesRequested</shortDescription>
+        <value>Entities requested are more than allowed per license. Request is sent only upto the limit. Please request an increase in limit</value>
+    </labels>
 </CustomLabels>
