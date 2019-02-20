@@ -89,7 +89,7 @@ public with sharing class OwlinEntitiesManagementController {
             }
             //total entities to request again on clicking link as batch id will get change>>
             Integer totalEntitiesToRequest = entitiesNotLinkedCount + entitiesRequestedCount;
-            if(totalEntitiesToRequest >= entitiesLicenseCount){
+            if(totalEntitiesToRequest > entitiesLicenseCount){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.WARNING, Label.Warning_MoreEntitiesRequested);
                 ApexPages.addMessage(msg);
             }

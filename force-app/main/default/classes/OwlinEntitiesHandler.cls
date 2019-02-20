@@ -39,7 +39,15 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getFeatureLicenseCount(){
-        return 5 ;
+        Integer licenseCount = 0;
+        try {
+            licenseCount = FeatureManagement.checkPackageIntegerValue('EntitiesCount');
+            if (licenseCount == 0) return 5;
+        }catch(Exception e){
+            system.debug('error received while fetching the feature parameter'+e.getMessage());
+            return 5;
+        }
+        return licenseCount ;
     }
 
     /**

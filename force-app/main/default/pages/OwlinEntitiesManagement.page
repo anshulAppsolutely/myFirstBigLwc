@@ -60,7 +60,7 @@
                     </tbody>
                 </table>
                 <footer class="slds-modal__footer">
-                    <apex:commandButton value="{!$Label.Link_Entities_to_Owlin}" styleclass="slds-button slds-button--neutral" action="{!linkAccountsToOwlin}" />
+                    <apex:commandButton value="{!$Label.Link_Entities_to_Owlin}" styleclass="slds-button slds-button--brand" action="{!linkAccountsToOwlin}" />
                     <apex:variable var="url" value="{!$Label.Increase_Entity_Limit}" />
     				<apex:outputlink styleClass="btn slds-button slds-button--neutral" value="{!MID(url, FIND('|', url) + 1, LEN(url))}" target="_blank">{!LEFT(url,(FIND('|', url)-1))}</apex:outputlink>
                 </footer>
