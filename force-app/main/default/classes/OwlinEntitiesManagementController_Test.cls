@@ -207,4 +207,30 @@ private class OwlinEntitiesManagementController_Test {
             Test.stopTest();
         }
     }
+
+    @isTest
+    static void testAccountBubbleException() {
+        //create custom setting test data
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
+            list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+            Configuration_Settings__c configProd = new Configuration_Settings__c();
+            configProd.Name = 'Test_Owlin';
+            configProd.Email__c = 'test@test.com';
+            configProd.Endpoint__c = 'api.test.owlin/v1/';
+            configProd.Password__c = 'testPassword';
+            configProd.Is_Primary__c = true;
+            configProd.Token__c = 'testToken';
+            configProd.Token_Expiry_Date__c = System.Today().addDays(2);
+            toInsertCustomSettingRecList.add(configProd);
+            insert toInsertCustomSettingRecList;
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(400,''));
+            Test.startTest();
+            try {
+                Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
+            } catch (Exception e) {
+                System.assertEquals(Label.Error, e.getMessage());
+            }
+            Test.stopTest();
+        }
+    }
 }

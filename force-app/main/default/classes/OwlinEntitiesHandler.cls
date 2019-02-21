@@ -131,7 +131,7 @@ public with sharing class OwlinEntitiesHandler {
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while getting entity timeline ' + e.getMessage());
-                return null;
+                throw e;
             }
         }
         return timeLineResponse;
