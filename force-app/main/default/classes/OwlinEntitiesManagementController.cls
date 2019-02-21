@@ -136,12 +136,13 @@ public with sharing class OwlinEntitiesManagementController {
         return null;
     }
     
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Map<String, Object> getAccountForBubble() {
         String token;
         Map<String, Object> response = new Map<String, Object>();
         //check for any filters
         //check backend configurations
+        system.debug('getting timeline from aura >>>');
         List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
         if (owlinConfigList == null || owlinConfigList.size() == 0) {
             AuraHandledException auraException = new AuraHandledException(Label.Error_NoOwlinConfig);
