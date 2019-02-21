@@ -197,6 +197,13 @@
         <value>New</value>
     </labels>
     <labels>
+        <fullName>noConfigMessage</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>noConfigMessage</shortDescription>
+        <value>No configurations have been created</value>
+    </labels>
+    <labels>
         <fullName>passwordLabel_Config</fullName>
         <language>en_US</language>
         <protected>true</protected>

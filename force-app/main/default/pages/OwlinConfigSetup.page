@@ -70,8 +70,8 @@
             </apex:outputPanel>
             <br/>
             <apex:outputPanel rendered="{!IF(configurations.size == 0, true,false)}">
-                
-                No Configurations are configured yet.
+
+                {!$Label.noConfigMessage}
             </apex:outputPanel>
             <!--<c:EditBuckarooConfig rendered="{!NOT(ISBLANK(editingRow))}" configRecord="{!editingRow}" />-->
             <apex:outputPanel rendered="{!NOT(ISBLANK(editingRow))}">
