@@ -29,7 +29,7 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @return
      */
-    public static Integer getRequestedEnities(){
+    public static Integer getRequestedEntities(){
         return [Select Count() from Account where Owlin_Entity_Requested_Id__c!=null and Owlin_Entity_Id__c = null] ;
     }
 
@@ -44,7 +44,7 @@ public with sharing class OwlinEntitiesHandler {
             licenseCount = System.FeatureManagement.checkPackageIntegerValue('Entities_Permitted');
         }catch(Exception e){
             system.debug('error received while fetching the feature parameter'+e.getMessage());
-            return 50;
+            return 4;
         }
         return licenseCount ;
     }
@@ -80,7 +80,7 @@ public with sharing class OwlinEntitiesHandler {
                 OwlinAPITokenRequestWrapper apiRequestWrapper = prepareAPITokenRequest(owlinConfig);
                 String body = Json.serialize(apiRequestWrapper);
                 HttpClient client = new HttpClient();
-                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'tokens';
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'tokens';
                 client.post(endpointString, body, null);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
@@ -109,22 +109,6 @@ public with sharing class OwlinEntitiesHandler {
             try {
                 //get all owlin entity that are required
                 Set<String> keys = new Set<String>();
-                // method is called from a with sharing context and will send records to which user has access too.
-                /*Set<String> sharedAccountIds = new Set<String>();
-
-                List<String> userOrGroupIds = new List<String>();
-                //get all the groups user is member of
-                for (GroupMember gm : [SELECT Id, group.id, group.name, group.type FROM GroupMember where UserOrGroupId = :UserInfo.getUserId()]){
-                    userOrGroupIds.add(gm.group.id);
-                }
-                //add current user in the group of ids
-                userOrGroupIds.add(UserInfo.getUserId());
-                //check in share object if any account has been shared to loggedin user
-                for(AccountShare s : [SELECT AccountId,  UserOrGroupId FROM AccountShare WHERE UserOrGroupId =: userOrGroupIds ]){
-                    sharedAccountIds.add(s.AccountId);
-                }*/
-
-                //query all accounts which were shared/accessible to it
                 for(Account account : [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Owlin_Entity_Id__c!=null
@@ -138,7 +122,7 @@ public with sharing class OwlinEntitiesHandler {
 
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
-                String endpointString = 'https://' + owlinConfig.Endpoint__c + 'jobs/salesforce/versions/production/timelines';
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines';
                 client.post(endpointString,inputJson, token!=null ? token: owlinConfig.Token__c);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {

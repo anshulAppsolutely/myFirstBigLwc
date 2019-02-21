@@ -3,6 +3,6 @@
     <customSettingsType>List</customSettingsType>
     <description>This configuration is used to maintain credentials and token for making a Owlin API calls</description>
     <enableFeeds>false</enableFeeds>
-    <label>Configuration Settings</label>
+    <label>Owlin Settings</label>
     <visibility>Protected</visibility>
 </CustomObject>

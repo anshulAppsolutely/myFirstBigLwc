@@ -46,7 +46,7 @@ private class OwlinEntitiesHandler_Test {
 
     @isTest
     static void entitiesRequestedCount(){
-        Integer count = OwlinEntitiesHandler.getRequestedEnities();
+        Integer count = OwlinEntitiesHandler.getRequestedEntities();
         System.assertEquals(1, count);
     }
 
@@ -54,7 +54,7 @@ private class OwlinEntitiesHandler_Test {
     static void entitiesLicenseCount(){
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
         Integer count = OwlinEntitiesHandler.getFeatureLicenseCount();
-        //System.assertEquals(1, count);
+        System.assert(count!=null);
     }
 
     @isTest

@@ -91,7 +91,7 @@ public with sharing class OwlinConfigSetupController {
                 List<Configuration_Settings__c> configurationList = [SELECT Id, Is_Primary__c FROM Configuration_Settings__c WHERE Is_Primary__c = true AND Id <>:editingRow.Id];
                 if(configurationList == null || configurationList.size() == 0) {
                     // This is not allowed, a minimum of 1 primary record must be present.
-                    ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'There must be one primary configuration');
+                    ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_PrimaryConfig);
                     ApexPages.addMessage(msg);
                     return null;
                 } else if(isUpdatable) {
@@ -121,7 +121,7 @@ public with sharing class OwlinConfigSetupController {
                 List<Configuration_Settings__c> configurationList = [SELECT Id, Is_Primary__c FROM Configuration_Settings__c WHERE Is_Primary__c = true AND Id <>:editingRow.Id];
                 if(configurationList == null || configurationList.size() == 0) {
                     // This is not allowed, a minimum of 1 primary record must be present.
-                    ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Configuration cannot be deleted. There must be one primary configuration');
+                    ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_PrimaryConfigDelete);
                     ApexPages.addMessage(msg);
                     return null;
                 } else {

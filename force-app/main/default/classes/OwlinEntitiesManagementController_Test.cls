@@ -35,7 +35,7 @@ private class OwlinEntitiesManagementController_Test {
     @isTest
     static void likedEntitiesCount(){
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
-        Integer count = controller.likedEntitiesCount;
+        Integer count = controller.linkedEntitiesCount;
         System.assertEquals(1, count);
     }
 
@@ -57,7 +57,7 @@ private class OwlinEntitiesManagementController_Test {
     static void entitiesLicenseCount(){
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
         Integer count = controller.entitiesLicenseCount;
-        //System.assertEquals(1, count);
+        System.assert(count!=null);
     }
 
     @isTest
@@ -181,7 +181,6 @@ private class OwlinEntitiesManagementController_Test {
     static void testAccountBubble() {
         //create custom setting test data
         system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
-            Test.startTest();
             list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
             Configuration_Settings__c configProd = new Configuration_Settings__c();
             configProd.Name = 'Test_Owlin';
@@ -193,9 +192,15 @@ private class OwlinEntitiesManagementController_Test {
             configProd.Token_Expiry_Date__c = System.Today().addDays(2);
             toInsertCustomSettingRecList.add(configProd);
             insert toInsertCustomSettingRecList;
-            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,null));
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getTimelines'));
             try {
-                OwlinEntitiesManagementController.getAccountForBubble();
+                Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
+                System.assert(timelineResponse!=null);
+                List<Account> entities = (List<Account>)timelineResponse.get('accounts');
+                String timeLine = (String)timelineResponse.get('values');
+                System.assertEquals(1,entities.size());
+                System.assert(timeLine!=null);
             } catch (Exception e) {
 
             }

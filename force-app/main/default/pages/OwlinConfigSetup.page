@@ -16,12 +16,12 @@
                         <div class="slds-media__body">
                             <h2 class="slds-card__header-title">
                                 <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Accounts">
-                                    <span>Configuration Setup</span>
+                                    <span>{!$Label.header_OwlinConfig}</span>
                                 </a>
                             </h2>
                         </div>
                         <div class="slds-no-flex">
-                            <apex:commandButton rendered="{!ISBLANK(editingRow)}" value="New" styleclass="slds-button slds-button--neutral" action="{!newConfig}" />
+                            <apex:commandButton rendered="{!ISBLANK(editingRow)}" value="{!$Label.newLabel}" styleclass="slds-button slds-button--neutral" action="{!newConfig}" />
                         </div>
                     </header>
                 </div>
@@ -33,16 +33,16 @@
                     <thead>
                     <tr class="slds-text-title">
                         <th scope="col">
-                            <div class="slds-truncate" title="Action">Action</div>
+                            <div class="slds-truncate" title="Action">{!$Label.actionLabel_Config}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Name">Name</div>
+                            <div class="slds-truncate" title="Name">{!$Label.nameLabel_Config}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Endpoint">Endpoint</div>
+                            <div class="slds-truncate" title="Endpoint">{!$Label.endpointLabel_Config}</div>
                         </th>
                         <th scope="col">
-                            <div class="slds-truncate" title="Primary">Primary</div>
+                            <div class="slds-truncate" title="Primary">{!$Label.primaryLabel_Config}</div>
                         </th>
                     </tr>
                     </thead>
@@ -93,7 +93,7 @@
                                 <div class="slds-form slds-form_stacked">
                                     <apex:outputPanel rendered="{!ISBLANK(editingRow.Id)}">
                                         <div class="slds-form-element">
-                                            <label class="slds-form-element__label" for="text-input-id-1">Name: </label>
+                                            <label class="slds-form-element__label" for="text-input-id-1">{!$Label.nameLabel_Config}: </label>
                                             <div class="slds-form-element__control">
                                                 <apex:inputtext styleclass="slds-input" value="{!editingRow.Name}"/>
                                             </div>
@@ -101,28 +101,28 @@
                                     </apex:outputPanel>
 
                                     <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="text-input-id-1">Endpoint: </label>
+                                        <label class="slds-form-element__label" for="text-input-id-1">{!$Label.endpointLabel_Config}: </label>
                                         <div class="slds-form-element__control">
                                             <apex:inputtext styleclass="slds-input" required="true" value="{!editingRow.Endpoint__c}"/>
                                         </div>
                                     </div>
 
                                     <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="text-input-id-2">Email: </label>
+                                        <label class="slds-form-element__label" for="text-input-id-2">{!$Label.emailLabel_Config}: </label>
                                         <div class="slds-form-element__control">
                                             <apex:inputtext styleclass="slds-input" required="true" value="{!editingRow.Email__c}"/>
                                         </div>
                                     </div>
 
                                     <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="text-input-id-3">Password: </label>
+                                        <label class="slds-form-element__label" for="text-input-id-3">{!$Label.passwordLabel_Config}: </label>
                                         <div class="slds-form-element__control">
                                             <apex:inputSecret styleclass="slds-input" required="true" value="{!editingRow.Password__c}"/>
                                         </div>
                                     </div>
 
                                     <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="text-input-id-3">Primary: </label>
+                                        <label class="slds-form-element__label" for="text-input-id-3">{!$Label.primaryLabel_Config}: </label>
                                         <div class="slds-form-element__control">
                                             <apex:inputCheckbox value="{!editingRow.Is_Primary__c}"/>
                                         </div>
@@ -130,10 +130,10 @@
                                 </div>
                             </div>
                             <footer class="slds-modal__footer">
-                                <apex:commandButton immediate="true" rendered="{!NOT(ISBLANK(editingRow))}" value="Cancel" styleclass="slds-button slds-button_neutral cancel_config" action="{!cancelConfig}" />
+                                <apex:commandButton immediate="true" rendered="{!NOT(ISBLANK(editingRow))}" value="{!$Label.cancelLabel}" styleclass="slds-button slds-button_neutral cancel_config" action="{!cancelConfig}" />
                                 <!--<apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)))}" value="Clone" styleclass="slds-button slds-button_neutral" action="{!cloneConfig}" /> -->
-                                <apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)),configurations.size > 1)}" value="Delete" styleclass="slds-button slds-button_neutral" action="{!deleteConfig}" />
-                                <apex:commandButton rendered="{!NOT(ISBLANK(editingRow))}" value="Save" styleclass="slds-button slds-button_brand new_config" action="{!saveConfig}" />
+                                <apex:commandButton rendered="{!AND(NOT(ISBLANK(editingRow)),NOT(ISBLANK(editingRow.Id)),configurations.size > 1)}" value="{!$Label.deleteLabel}" styleclass="slds-button slds-button_neutral" action="{!deleteConfig}" />
+                                <apex:commandButton rendered="{!NOT(ISBLANK(editingRow))}" value="{!$Label.saveLabel}" styleclass="slds-button slds-button_brand new_config" action="{!saveConfig}" />
                             </footer>
                         </div>
                     </section>

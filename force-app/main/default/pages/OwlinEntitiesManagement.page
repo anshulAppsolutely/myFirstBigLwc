@@ -16,7 +16,7 @@
                         <div class="slds-media__body">
                             <h2 class="slds-card__header-title">
                                 <a href="javascript:void(0);" class="slds-card__header-link" title="Outer Card Header">
-                                    <span>Owlin Entity Manager</span>
+                                    <span>{!$Label.header_OwlinEntityManager}</span>
                                 </a>
                             </h2>
                         </div>
@@ -45,7 +45,7 @@
                     <tbody>
                     <tr>
                         <td data-label="Linked Entities">
-                            <div class="slds-truncate" title="Linked Entities">{!likedEntitiesCount}</div>
+                            <div class="slds-truncate" title="Linked Entities">{!linkedEntitiesCount}</div>
                         </td>
                         <td data-label="Entities Requested">
                             <div class="slds-truncate" title="Entities Requested">{!entitiesRequestedCount}</div>
@@ -61,8 +61,7 @@
                 </table>
                 <footer class="slds-modal__footer">
                     <apex:commandButton value="{!$Label.Link_Entities_to_Owlin}" styleclass="slds-button slds-button--brand" action="{!linkAccountsToOwlin}" />
-                    <apex:variable var="url" value="{!$Label.Increase_Entity_Limit}" />
-    				<apex:outputlink styleClass="btn slds-button slds-button--neutral" value="{!MID(url, FIND('|', url) + 1, LEN(url))}" target="_blank">{!LEFT(url,(FIND('|', url)-1))}</apex:outputlink>
+    				<apex:outputlink styleClass="btn slds-button slds-button--neutral" value="{!$Label.link_RequestAllowance}" target="_blank">{!$Label.Increase_Entity_Limit}</apex:outputlink>
                 </footer>
             </div>
         </apex:form>

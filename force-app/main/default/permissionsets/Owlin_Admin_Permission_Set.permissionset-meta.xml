@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>This is used to give permission to user to access tabs that are managed for backend configuration and also for managing entities</description>
+    <description>This is used to give permission to any user to access tabs that are managed for backend configuration and also for managing entities</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Owlin_Entity_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Account.Owlin_Entity_Requested_Id__c</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>true</editable>
-        <field>Account.Owlin_Link_Requested__c</field>
+        <field>Account.Owlin_Entity_Requested_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>

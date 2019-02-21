@@ -21,14 +21,14 @@ public with sharing class OwlinEntitiesManagementController {
 
     }
 
-    public Integer likedEntitiesCount
+    public Integer linkedEntitiesCount
     {
         get
         {
-            if(likedEntitiesCount==null) {
-                likedEntitiesCount = OwlinEntitiesHandler.getLinkedEnities();
+            if(linkedEntitiesCount==null) {
+                linkedEntitiesCount = OwlinEntitiesHandler.getLinkedEnities();
             }
-            return likedEntitiesCount;
+            return linkedEntitiesCount;
         }
         set;
     }
@@ -50,7 +50,7 @@ public with sharing class OwlinEntitiesManagementController {
         get
         {
             if(entitiesRequestedCount==null) {
-                entitiesRequestedCount = OwlinEntitiesHandler.getRequestedEnities();
+                entitiesRequestedCount = OwlinEntitiesHandler.getRequestedEntities();
             }
             return entitiesRequestedCount;
         }
@@ -76,20 +76,20 @@ public with sharing class OwlinEntitiesManagementController {
     public PageReference linkAccountsToOwlin(){
         try {
             String token = null;
-            Integer limitEntitiesFilter = entitiesLicenseCount - likedEntitiesCount;
+            Integer limitEntitiesFilter = entitiesLicenseCount - linkedEntitiesCount;
             if (entitiesNotLinkedCount == null || entitiesNotLinkedCount == 0){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_NoEntitiesToLink);
                 ApexPages.addMessage(msg);
                 return null;
             }
-            if (likedEntitiesCount >= entitiesLicenseCount) {
+            if (linkedEntitiesCount >= entitiesLicenseCount) {
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_EntitiesLicense);
                 ApexPages.addMessage(msg);
                 return null;
             }
             //total entities to request again on clicking link as batch id will get change>>
             Integer totalEntitiesToRequest = entitiesNotLinkedCount + entitiesRequestedCount;
-            if(totalEntitiesToRequest > entitiesLicenseCount){
+            if(totalEntitiesToRequest > limitEntitiesFilter){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.WARNING, Label.Warning_MoreEntitiesRequested);
                 ApexPages.addMessage(msg);
             }
@@ -136,7 +136,7 @@ public with sharing class OwlinEntitiesManagementController {
         return null;
     }
     
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static Map<String, Object> getAccountForBubble() {
         String token;
         Map<String, Object> response = new Map<String, Object>();
@@ -180,19 +180,6 @@ public with sharing class OwlinEntitiesManagementController {
         try{
             String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
             OwlinEntitiesHandler.saveAPIToken(token);
-            Set<String> sharedAccountIds = new Set<String>();
-            List<String> userOrGroupIds = new List<String>();
-            //the class is marked as with sharing. Will get all the records for a user to which he has access to!
-            /*for (GroupMember gm : [SELECT Id, group.id, group.name, group.type FROM GroupMember where UserOrGroupId = :UserInfo.getUserId()]){
-                userOrGroupIds.add(gm.group.id);
-            }
-            //add current user in the group of ids
-            userOrGroupIds.add(UserInfo.getUserId());
-            //check in share object if any account has been shared to loggedin user
-            for(AccountShare s : [SELECT AccountId,  UserOrGroupId FROM AccountShare WHERE UserOrGroupId =: userOrGroupIds ]){
-                sharedAccountIds.add(s.AccountId);
-            }*/
-            // check for limit
             List<Account> accessibleAccounts = [SELECT
                     Id, Name, Owlin_Entity_Id__c
             FROM Account

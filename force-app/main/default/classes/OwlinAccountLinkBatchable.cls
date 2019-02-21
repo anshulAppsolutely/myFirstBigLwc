@@ -2,7 +2,7 @@
  * this class is used to link entities to owlin
  * default scope of a batch is 200. API is bulkified to handle 200 records in one go
  */
-global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts  {
+public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts  {
 
     Exception[] errors = new Exception[0];
     List<Configuration_Settings__c> owlinConfiguration;
@@ -19,7 +19,7 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
         this.limitFilter = limitEntitiesFilter;
     }
 
-    global Database.QueryLocator start(Database.BatchableContext BC) {
+    public Database.QueryLocator start(Database.BatchableContext BC) {
         // collect the batches of records or objects to be passed to execute
         if(String.isBlank(queryString)) {
             String queryFilter = 'WHERE Owlin_Entity_Requested_Id__c != \''+ BC.getJobId() +'\' '+
@@ -36,7 +36,7 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
         return Database.getQueryLocator(queryString);
     }
 
-    global void execute(Database.BatchableContext BC, List<Account> accList) {
+    public void execute(Database.BatchableContext BC, List<Account> accList) {
 
         system.debug('accList size >>'+accList.size()+ 'token >>'+token);
         if(accList.size() > 0) {
@@ -83,11 +83,7 @@ global class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
         }
     }
 
-    global void finish(Database.BatchableContext BC) {
+    public void finish(Database.BatchableContext BC) {
         // execute any post-processing operations like error handling
-        if(!errors.isEmpty()) {
-            // TODO check with dan
-        }
-
     }
 }
