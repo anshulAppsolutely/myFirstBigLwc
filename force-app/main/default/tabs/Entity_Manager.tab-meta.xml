@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>This tab is used to manage entities and link them to Owlin. Its is also used to see how count on how many entities are linked or requested and the license limit.</description>
-    <label>Entity Manager</label>
+    <label>Owlin Entity Management</label>
     <mobileReady>false</mobileReady>
     <motif>Custom89: Saxophone</motif>
     <page>OwlinEntitiesManagement</page>
