@@ -10,7 +10,7 @@
                                 <svg class='slds-icon slds-icon_small' aria-hidden='true'>
                                     <use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href="{!URLFOR($Asset.SLDS,'assets/icons/standard-sprite/svg/symbols.svg#account')}"/>
                                 </svg>
-                                <span class="slds-assistive-text">Entities Management</span>
+                                <span class="slds-assistive-text">{!$Label.header_OwlinEntityManager}</span>
                             </span>
                         </div>
                         <div class="slds-media__body">

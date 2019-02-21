@@ -10,7 +10,7 @@
                             <svg class='slds-icon slds-icon--medium' aria-hidden='true'>
                                 <use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href="{!URLFOR($Asset.SLDS,'assets/icons/utility-sprite/svg/symbols.svg#settings')}"/>
                             </svg>
-                            <span class="slds-assistive-text">configuration</span>
+                            <span class="slds-assistive-text">{!$Label.header_OwlinConfig}</span>
                         </span>
                         </div>
                         <div class="slds-media__body">
