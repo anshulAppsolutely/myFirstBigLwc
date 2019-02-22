@@ -87,12 +87,6 @@ public with sharing class OwlinEntitiesManagementController {
                 ApexPages.addMessage(msg);
                 return null;
             }
-            //total entities to request again on clicking link as batch id will get change>>
-            Integer totalEntitiesToRequest = entitiesNotLinkedCount + entitiesRequestedCount;
-            if(totalEntitiesToRequest > limitEntitiesFilter){
-                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.WARNING, Label.Warning_MoreEntitiesRequested);
-                ApexPages.addMessage(msg);
-            }
             //check backend configurations
             List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
             if(owlinConfigList == null || owlinConfigList.size() == 0){
@@ -100,6 +94,7 @@ public with sharing class OwlinEntitiesManagementController {
                 ApexPages.addMessage(msg);
                 return null;
             }
+
             Date today = System.Today();
             if(owlinConfigList!=null && owlinConfigList.size() > 0
                     && owlinConfigList[0]!= null
@@ -119,6 +114,12 @@ public with sharing class OwlinEntitiesManagementController {
             if(token == null){
                 ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_APITokenError));
                 return null;
+            }
+            //total entities to request again on clicking link as batch id will get change>>
+            Integer totalEntitiesToRequest = entitiesNotLinkedCount + entitiesRequestedCount;
+            if(totalEntitiesToRequest > limitEntitiesFilter){
+                ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.WARNING, Label.Warning_MoreEntitiesRequested);
+                ApexPages.addMessage(msg);
             }
             system.debug('token received >>>'+token);
             //get accounts that can be linked based on license
