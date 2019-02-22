@@ -77,7 +77,7 @@ public with sharing class OwlinEntitiesManagementController {
         try {
             String token = null;
             Integer limitEntitiesFilter = entitiesLicenseCount - linkedEntitiesCount;
-            if (entitiesNotLinkedCount == null || entitiesNotLinkedCount == 0){
+            if (entitiesNotLinkedCount == 0 && entitiesRequestedCount == 0){
                 ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.ERROR, Label.Error_NoEntitiesToLink);
                 ApexPages.addMessage(msg);
                 return null;
