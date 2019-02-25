@@ -10,15 +10,24 @@ export default class TopNews extends LightningElement {
     headerColor;
 
     @api
-    statKey;
+    topNewsKey;
 
     @track topNewsServer;
 
+    @track
+    loading = true;
+
+    //get headerColorToDisplay () {return 'color:$headerColor'}
+
+    //get tagColorToDisplay () {return 'background-color:$tagColor'}
+
     /** Get accounts from Apex */
-    @wire(getTopNewsData)
+    @wire(getTopNewsData, {filter: '$topNewsKey'})
     wiredBubbleResponse({ error, data }) {
         if (data) {
-            this.topNewsServer = data;
+            this.loading = false;
+            /*if(data!=null )this.topNewsServer = JSON.parse(data);*/
+
         } else if (error) {
             this.errorToast(error.message);
         }

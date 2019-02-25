@@ -1,5 +1,8 @@
 <template>
-    <div class="slds-m-top_medium slds-m-bottom_x-large">
+    <div class="slds-card">
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
         <div class="slds-p-around_medium lgc-bg">
             <ul class="slds-has-dividers_bottom-space">
                 <template for:each={topnews} for:item="top">

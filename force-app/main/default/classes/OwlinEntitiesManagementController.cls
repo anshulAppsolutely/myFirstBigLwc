@@ -183,7 +183,7 @@ public with sharing class OwlinEntitiesManagementController {
         }
         try{
             String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
-            //system.debug('timelineResponse>>'+timelineResponse);
+            system.debug('timelineResponse in bubble>>'+timelineResponse);
             if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
             List<Account> accessibleAccounts = [SELECT
                     Id, Name, Owlin_Entity_Id__c
@@ -206,58 +206,62 @@ public with sharing class OwlinEntitiesManagementController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static Map<String, Object> getTopNewsData() {
+    public static Map<String, Object> getTopNewsData(String filter) {
         Map<String, Object> response = new Map<String, Object>();
-        try{
-            Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
-            system.debug('timelineResponse  from bubble>>'+timelineResponse);
-            String timeline = (String)timelineResponse.get('values');
-            system.debug('timeline in top new >>'+timeline);
-            List<Object> objm = (List<Object>)JSON.deserializeUntyped(timeline);
-            system.debug('aaa'+objm);
-            Map<String, List<String>> topNewRequest = new Map<String,List<String>>();
+        system.debug('filter >>>'+filter);
+        if(!String.isBlank(filter)) {
+            try {
+                //method is cached
+                Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
+                system.debug('timelineResponse  from bubble>>' + timelineResponse);
+                String timeline = (String) timelineResponse.get('values');
+                system.debug('timeline in top new >>' + timeline);
+                List<Object> objm = (List<Object>) JSON.deserializeUntyped(timeline);
+                system.debug('aaa' + objm);
+                Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
 
 
-            for(Object responseObject : objm) {
-                String resObjString = JSON.serialize(responseObject);
-                if(resObjString!=null){
-                    Map<String, Object> resObjMap = (Map<String, Object>) JSON.deserializeUntyped(resObjString);
-                    for(String keyVal : resObjMap.keySet()) {
-                        String entityKey;
-                        if(keyVal == 'key'){
-                            entityKey = (String)resObjMap.get(keyVal);
-                            if(!topNewRequest.containsKey(entityKey)) topNewRequest.put((String)resObjMap.get(keyVal), new List<String>());
-                        }
+                for (Object responseObject : objm) {
+                    String resObjString = JSON.serialize(responseObject);
+                    if (resObjString != null) {
+                        Map<String, Object> resObjMap = (Map<String, Object>) JSON.deserializeUntyped(resObjString);
+                        for (String keyVal : resObjMap.keySet()) {
+                            String entityKey;
+                            if (keyVal == 'key') {
+                                entityKey = (String) resObjMap.get(keyVal);
+                                if (!topNewRequest.containsKey(entityKey)) topNewRequest.put((String) resObjMap.get(keyVal), new List<String>());
+                            }
 
-                        if(keyVal == 'stats') {
-                            Object statsObject = resObjMap.get(keyVal);
-                            String jsonObject = JSON.serialize(statsObject);
-                            if(jsonObject!=null) {
-                                Map<String, Object> statsMap = (Map<String, Object>) JSON.deserializeUntyped(jsonObject);
-                                system.debug('statsMap >>'+statsMap);
-                                if (statsMap != null) {
-                                    for(String keyval1 : statsMap.keySet()) {
-                                        if(keyval1 == 'topnews:month'){
-                                            Object topNews = (Object) statsMap.get(keyval1);
-                                            String topNewsObject = JSON.serialize(topNews);
-                                            Map<String, Object> topNewsMap = (Map<String, Object>) JSON.deserializeUntyped(topNewsObject);
-                                            System.debug('topNews: '+topNewsMap);
+                            if (keyVal == 'stats') {
+                                Object statsObject = resObjMap.get(keyVal);
+                                String jsonObject = JSON.serialize(statsObject);
+                                if (jsonObject != null) {
+                                    Map<String, Object> statsMap = (Map<String, Object>) JSON.deserializeUntyped(jsonObject);
+                                    system.debug('statsMap >>' + statsMap);
+                                    if (statsMap != null) {
+                                        for (String keyval1 : statsMap.keySet()) {
+                                            if (keyval1 == 'topnews:month') {
+                                                Object topNews = (Object) statsMap.get(keyval1);
+                                                String topNewsObject = JSON.serialize(topNews);
+                                                Map<String, Object> topNewsMap = (Map<String, Object>) JSON.deserializeUntyped(topNewsObject);
+                                                System.debug('topNews: ' + topNewsMap);
+                                            }
+
                                         }
 
                                     }
-
                                 }
                             }
                         }
                     }
                 }
-            }
-            system.debug('topNewRequest >>'+topNewRequest);
+                system.debug('topNewRequest >>' + topNewRequest);
 
-        }catch(Exception e){
-            AuraHandledException auraException = new AuraHandledException(Label.Error);
-            auraException.setMessage(Label.Error);
-            throw auraException;
+            } catch (Exception e) {
+                AuraHandledException auraException = new AuraHandledException(Label.Error);
+                auraException.setMessage(Label.Error);
+                throw auraException;
+            }
         }
         return response;
     }
