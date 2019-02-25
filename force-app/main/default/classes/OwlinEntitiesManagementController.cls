@@ -141,6 +141,7 @@ public with sharing class OwlinEntitiesManagementController {
     public static Map<String, Object> getAccountForBubble() {
         String token;
         Map<String, Object> response = new Map<String, Object>();
+        Boolean isTokenNew = false;
         //check for any filters
         //check backend configurations
         system.debug('getting timeline from aura >>>');
@@ -164,6 +165,7 @@ public with sharing class OwlinEntitiesManagementController {
                 && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
             system.debug('requesting API token from linkAccountsToOwlin');
             token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+            isTokenNew = true;
         }
 
         if (token == null) {
@@ -181,7 +183,8 @@ public with sharing class OwlinEntitiesManagementController {
         }
         try{
             String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
-            OwlinEntitiesHandler.saveAPIToken(token);
+            //system.debug('timelineResponse>>'+timelineResponse);
+            if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
             List<Account> accessibleAccounts = [SELECT
                     Id, Name, Owlin_Entity_Id__c
             FROM Account
@@ -189,6 +192,68 @@ public with sharing class OwlinEntitiesManagementController {
             response.put('accounts', accessibleAccounts);
             response.put('values', timelineResponse);
             
+        }catch(Exception e){
+            AuraHandledException auraException = new AuraHandledException(Label.Error);
+            auraException.setMessage(Label.Error);
+            throw auraException;
+        }
+        return response;
+    }
+
+    public static Map<String, Object> jsonShuffle(Object obj) {
+        String jsonString = JSON.serialize(obj);
+        return (Map<String, Object>) JSON.deserializeUntyped(jsonString);
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static Map<String, Object> getTopNewsData() {
+        Map<String, Object> response = new Map<String, Object>();
+        try{
+            Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
+            system.debug('timelineResponse  from bubble>>'+timelineResponse);
+            String timeline = (String)timelineResponse.get('values');
+            system.debug('timeline in top new >>'+timeline);
+            List<Object> objm = (List<Object>)JSON.deserializeUntyped(timeline);
+            system.debug('aaa'+objm);
+            Map<String, List<String>> topNewRequest = new Map<String,List<String>>();
+
+
+            for(Object responseObject : objm) {
+                String resObjString = JSON.serialize(responseObject);
+                if(resObjString!=null){
+                    Map<String, Object> resObjMap = (Map<String, Object>) JSON.deserializeUntyped(resObjString);
+                    for(String keyVal : resObjMap.keySet()) {
+                        String entityKey;
+                        if(keyVal == 'key'){
+                            entityKey = (String)resObjMap.get(keyVal);
+                            if(!topNewRequest.containsKey(entityKey)) topNewRequest.put((String)resObjMap.get(keyVal), new List<String>());
+                        }
+
+                        if(keyVal == 'stats') {
+                            Object statsObject = resObjMap.get(keyVal);
+                            String jsonObject = JSON.serialize(statsObject);
+                            if(jsonObject!=null) {
+                                Map<String, Object> statsMap = (Map<String, Object>) JSON.deserializeUntyped(jsonObject);
+                                system.debug('statsMap >>'+statsMap);
+                                if (statsMap != null) {
+                                    for(String keyval1 : statsMap.keySet()) {
+                                        if(keyval1 == 'topnews:month'){
+                                            Object topNews = (Object) statsMap.get(keyval1);
+                                            String topNewsObject = JSON.serialize(topNews);
+                                            Map<String, Object> topNewsMap = (Map<String, Object>) JSON.deserializeUntyped(topNewsObject);
+                                            System.debug('topNews: '+topNewsMap);
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            system.debug('topNewRequest >>'+topNewRequest);
+
         }catch(Exception e){
             AuraHandledException auraException = new AuraHandledException(Label.Error);
             auraException.setMessage(Label.Error);

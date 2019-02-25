@@ -127,7 +127,7 @@ public with sharing class OwlinEntitiesHandler {
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
                     timeLineResponse = httpResponse.getBody();
-                    system.debug('timeLineResponse >>'+timeLineResponse);
+                    //system.debug('timeLineResponse >>'+timeLineResponse);
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while getting entity timeline ' + e.getMessage());
@@ -162,7 +162,7 @@ public with sharing class OwlinEntitiesHandler {
         for(Account entity : requestedAccountList){
             OwlinLinkEntitiesRequestWrapper.entities entityToLink = new OwlinLinkEntitiesRequestWrapper.entities();
             entityToLink.id = entity.Id;
-            if(!String.ISBLANK(entity.Website)) entityToLink.domain = entity.Website;
+            entityToLink.domain = String.ISBLANK(entity.Website) ? 'null': entity.Website;
             entityToLink.name = entity.Name;
             entityList.add(entityToLink);
         }

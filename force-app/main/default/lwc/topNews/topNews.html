@@ -1,0 +1,27 @@
+<template>
+    <div class="slds-m-top_medium slds-m-bottom_x-large">
+        <div class="slds-p-around_medium lgc-bg">
+            <ul class="slds-has-dividers_bottom-space">
+                <template for:each={topnews} for:item="top">
+                    <li key={top.score} class="slds-item">
+                        <lightning-tile href="#" type="media">
+                            <div>
+                                <span class="header">{top.header}&nbsp;</span>
+<!--                                <div class="tooltip">
+                                    <lightning-button-icon icon-name="standard:link" variant="container" alternative-text="Settings" onmouseover={tooltipfunc}></lightning-button-icon></lightning-icon>
+                                    <div class="tooltiptext">
+                                        test tool tip
+
+                                    </div>
+                                </div>-->
+                            </div>
+                            <p class="slds-truncate" title="7 Members">
+                                <span>3 hours ago</span> via <span>{top.url}</span></p>
+                            <div class="owlin-dashboard-ui-topnews-item-article-keywords"><div class="owlin-ui-label">money laundering</div><div class="owlin-ui-label">escandalo</div></div>
+                        </lightning-tile>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </div>
+</template>

@@ -4,5 +4,6 @@
     },
     "devDependencies": {
         "@salesforce/lwc-jest": "^0.4.7"
-    }
+    },
+    "name": "owlin"
 }
