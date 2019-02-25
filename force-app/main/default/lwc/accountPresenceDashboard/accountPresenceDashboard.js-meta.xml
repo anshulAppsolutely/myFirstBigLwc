@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="accountPresenceDashboard">
+    <apiVersion>45.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Accounts Presence Dashboard</masterLabel>
+    <description>Bubble chart containing data for all user's accounts</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+
+    </targets>
+    <targetConfigs>
+      <targetConfig targets="lightning__AppPage, lightning__HomePage, lightning__RecordPage">
+          <property name="bubbleColor" type="String" default="#1f77b4"  label="Bubble Colour"/>
+          <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
+          <property name="title" type="String" default="Your Accounts: Owlin News Presence" label="Title" />
+          <property name="statKey" type="String" default="delta:month" label="Owlin Default Statistics Key" />
+      </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

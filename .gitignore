@@ -1,3 +1,25 @@
 .sfdx
 .vscode
-
+.DS_Store
+.idea/encodings.xml
+.idea/illuminatedCloud.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+force-app/main/default/profiles/Admin.profile-meta.xml
+force-app/main/default/profiles/Custom%3A Marketing Profile.profile-meta.xml
+force-app/main/default/profiles/Custom%3A Sales Profile.profile-meta.xml
+force-app/main/default/profiles/Custom%3A Support Profile.profile-meta.xml
+force-app/main/default/settings/OrgPreference.settings-meta.xml
+IlluminatedCloud/OwlinSprint1/OfflineSymbolTable.zip
+Owlin.iml
+force-app/main/default/layouts/Account-Account %28Marketing%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Sales%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Support%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account Layout.layout-meta.xml
+.idea/inspectionProfiles/Project_Default.xml
+force-app/main/default/flexipages/Test_LWC.flexipage-meta.xml
+package-lock.json
+node_modules
+.idea/workspace.xml___jb_tmp___

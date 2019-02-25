@@ -1,7 +1,14 @@
 {
     "orgName": "Owlin for Salesforce",
+    "country": "US",
     "edition": "Developer",
-    "orgPreferences" : {
-        "enabled": ["S1DesktopEnabled"]
+    "language": "en",
+    "features": [],
+    "orgPreferences": {
+        "enabled": [
+            "S1DesktopEnabled",
+            "Translation"
+        ],
+        "disabled": []
     }
 }

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Entities_Allowed_Per_License_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities Allowed Per License Count</shortDescription>
+        <value>Entities Allowed Per License</value>
+    </labels>
+    <labels>
+        <fullName>Entities_Requested_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities Requested Count</shortDescription>
+        <value>Entities Requested</value>
+    </labels>
+    <labels>
+        <fullName>Entities_to_Link_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Entities to Link Count</shortDescription>
+        <value>Entities to Link</value>
+    </labels>
+    <labels>
+        <fullName>Error</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error</shortDescription>
+        <value>Request failed. Please try again later or contact your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Error_APITokenError</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_APITokenError</shortDescription>
+        <value>Request failed. Token not received</value>
+    </labels>
+    <labels>
+        <fullName>Error_EntitiesLicense</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_EntitiesLicense</shortDescription>
+        <value>You have exceeded your licence&#39;s entity allowance. Please request an additional allowance from Owlin</value>
+    </labels>
+    <labels>
+        <fullName>Error_NoData</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error_NoData</shortDescription>
+        <value>There is no data available for this period.</value>
+    </labels>
+    <labels>
+        <fullName>Error_NoEntitiesToLink</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_NoEntitiesToLink</shortDescription>
+        <value>There are no accounts to link</value>
+    </labels>
+    <labels>
+        <fullName>Error_NoOwlinConfig</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_NoOwlinConfig</shortDescription>
+        <value>Please configure Owlin data in setup</value>
+    </labels>
+    <labels>
+        <fullName>Error_PrimaryConfig</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error PrimaryConfig</shortDescription>
+        <value>There must be one primary configuration</value>
+    </labels>
+    <labels>
+        <fullName>Error_PrimaryConfigDelete</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error PrimaryConfigDelete</shortDescription>
+        <value>Configuration cannot be deleted. There must be one primary configuration</value>
+    </labels>
+    <labels>
+        <fullName>Error_Title</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Title</shortDescription>
+        <value>Error</value>
+    </labels>
+    <labels>
+        <fullName>Increase_Entity_Limit</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Increase Entity Limit</shortDescription>
+        <value>Request an additional allowance</value>
+    </labels>
+    <labels>
+        <fullName>Link_Entities_to_Owlin</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link Entities to Owlin</shortDescription>
+        <value>Link Entities</value>
+    </labels>
+    <labels>
+        <fullName>Linked_Entities_Count</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Linked Entities Count</shortDescription>
+        <value>Entities Linked</value>
+    </labels>
+    <labels>
+        <fullName>Owlin_Permission_Error</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Owlin Permission Error</shortDescription>
+        <value>User does not have permission. Please contact system administrator</value>
+    </labels>
+    <labels>
+        <fullName>Success_EntitiesLinked</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success_EntitiesLinked</shortDescription>
+        <value>Account linking requested from Owlin. Please check back later</value>
+    </labels>
+    <labels>
+        <fullName>Warning_MoreEntitiesRequested</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning_MoreEntitiesRequested</shortDescription>
+        <value>Your licence&#39;s allowance will be exceeded, we have requested only the most recent accounts are linked up to the limit of your allowance. Please request an additional allowance from Owlin</value>
+    </labels>
+    <labels>
+        <fullName>actionLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>actionLabel_Config</shortDescription>
+        <value>Action</value>
+    </labels>
+    <labels>
+        <fullName>cancelLabel</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>cancelLabel</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>deleteLabel</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>deleteLabel</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>emailLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>emailLabel_Config</shortDescription>
+        <value>Email</value>
+    </labels>
+    <labels>
+        <fullName>endpointLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>endpointLabel_Config</shortDescription>
+        <value>Endpoint</value>
+    </labels>
+    <labels>
+        <fullName>header_OwlinConfig</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>header_OwlinConfig</shortDescription>
+        <value>Owlin Setup</value>
+    </labels>
+    <labels>
+        <fullName>header_OwlinEntityManager</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>header_OwlinEntityManager</shortDescription>
+        <value>Owlin Entity Management</value>
+    </labels>
+    <labels>
+        <fullName>link_RequestAllowance</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>link_RequestAllowance</shortDescription>
+        <value>https://www.owlin.com</value>
+    </labels>
+    <labels>
+        <fullName>nameLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>nameLabel_Config</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>newLabel</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>newLabel</shortDescription>
+        <value>New</value>
+    </labels>
+    <labels>
+        <fullName>noConfigMessage</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>noConfigMessage</shortDescription>
+        <value>No configurations have been created</value>
+    </labels>
+    <labels>
+        <fullName>passwordLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>passwordLabel_Config</shortDescription>
+        <value>Password</value>
+    </labels>
+    <labels>
+        <fullName>primaryLabel_Config</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>primaryLabel_Config</shortDescription>
+        <value>Primary</value>
+    </labels>
+    <labels>
+        <fullName>saveLabel</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>saveLabel</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>url_OwlinBackend</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>url_OwlinBackend</shortDescription>
+        <value>api.owlin.com/v1/</value>
+    </labels>
+</CustomLabels>
