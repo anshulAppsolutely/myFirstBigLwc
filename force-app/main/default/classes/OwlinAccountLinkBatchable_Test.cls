@@ -22,7 +22,6 @@ private class OwlinAccountLinkBatchable_Test {
         list<Account> accountList = new list<Account>();
         Account acc1 = new Account();
         acc1.Name = 'Test';
-        acc1.Website = 'test.com';
         accountList.add(acc1);
 
         Account acc2 = new Account();

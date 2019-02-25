@@ -21,7 +21,7 @@ public with sharing class OwlinEntitiesHandler {
      * @return
      */
     public static Integer getNotLinkedEnities(){
-        return [Select Count() from Account where website!=null and Owlin_Entity_Requested_Id__c = null and Owlin_Entity_Id__c = null] ;
+        return [Select Count() from Account where Owlin_Entity_Requested_Id__c = null and Owlin_Entity_Id__c = null] ;
     }
 
     /**
@@ -162,7 +162,7 @@ public with sharing class OwlinEntitiesHandler {
         for(Account entity : requestedAccountList){
             OwlinLinkEntitiesRequestWrapper.entities entityToLink = new OwlinLinkEntitiesRequestWrapper.entities();
             entityToLink.id = entity.Id;
-            entityToLink.domain = entity.Website;
+            if(!String.ISBLANK(entity.Website)) entityToLink.domain = entity.Website;
             entityToLink.name = entity.Name;
             entityList.add(entityToLink);
         }
