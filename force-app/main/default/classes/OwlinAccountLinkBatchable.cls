@@ -25,7 +25,7 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
             String queryFilter = 'WHERE Owlin_Entity_Requested_Id__c != \''+ BC.getJobId() +'\' '+
                     'AND Owlin_Entity_Id__c = null ' +
                     'AND Website != null ' +
-                    'ORDER BY CreatedDate DESC';
+                    'ORDER BY LastModifiedDate DESC';
             if(limitFilter!=null && limitFilter > 0){
                 queryFilter += ' limit '+limitFilter;
             }

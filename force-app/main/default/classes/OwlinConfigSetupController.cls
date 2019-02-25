@@ -46,6 +46,7 @@ public with sharing class OwlinConfigSetupController {
         try {
             Configuration_Settings__c newConf = (Configuration_Settings__c) Configuration_Settings__c.sObjectType.newSObject(null, true);
             // Brings user to the edit component
+            newConf.Endpoint__c = Label.url_OwlinBackend;
             this.editingRow = newConf;
         }
         catch (Exception e) {

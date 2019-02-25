@@ -44,7 +44,7 @@ public with sharing class OwlinEntitiesHandler {
             licenseCount = System.FeatureManagement.checkPackageIntegerValue('Entities_Permitted');
         }catch(Exception e){
             system.debug('error received while fetching the feature parameter'+e.getMessage());
-            return 4;
+            return 40;
         }
         return licenseCount ;
     }

@@ -173,7 +173,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>header_OwlinEntityManager</shortDescription>
-        <value>Owlin Entity Manager</value>
+        <value>Owlin Entity Management</value>
     </labels>
     <labels>
         <fullName>link_RequestAllowance</fullName>
@@ -223,5 +223,12 @@
         <protected>true</protected>
         <shortDescription>saveLabel</shortDescription>
         <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>url_OwlinBackend</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>url_OwlinBackend</shortDescription>
+        <value>api.owlin.com/v1/</value>
     </labels>
 </CustomLabels>

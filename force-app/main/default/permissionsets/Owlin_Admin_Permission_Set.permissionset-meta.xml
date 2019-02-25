@@ -25,11 +25,11 @@
     </objectPermissions>
     <tabSettings>
         <tab>Configuration_Setup</tab>
-        <visibility>Visible</visibility>
+        <visibility>Available</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>Entity_Manager</tab>
-        <visibility>Visible</visibility>
+        <tab>Owlin_Entity_Management</tab>
+        <visibility>Available</visibility>
     </tabSettings>
     <tabSettings>
         <tab>standard-Account</tab>

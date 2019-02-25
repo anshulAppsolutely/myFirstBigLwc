@@ -185,7 +185,7 @@ public with sharing class OwlinEntitiesManagementController {
             List<Account> accessibleAccounts = [SELECT
                     Id, Name, Owlin_Entity_Id__c
             FROM Account
-            WHERE Owlin_Entity_Id__c!=null ORDER BY CreatedDate DESC];
+            WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC];
             response.put('accounts', accessibleAccounts);
             response.put('values', timelineResponse);
             
