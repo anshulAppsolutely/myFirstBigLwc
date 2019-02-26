@@ -200,10 +200,7 @@ public with sharing class OwlinEntitiesManagementController {
         return response;
     }
 
-    public static Map<String, Object> jsonShuffle(Object obj) {
-        String jsonString = JSON.serialize(obj);
-        return (Map<String, Object>) JSON.deserializeUntyped(jsonString);
-    }
+
 
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getTopNewsData(String filter) {
@@ -222,7 +219,7 @@ public with sharing class OwlinEntitiesManagementController {
                 for (Object responseObject : objm) {
                     String entityKey;
                     List<String> articles = new List<String>();
-                    Map<String, Object> responseMap = jsonShuffle(responseObject);
+                    Map<String, Object> responseMap = OwlinEntitiesHandler.getJsonDesialzedMap(responseObject);
                     if (responseMap != null) {
                         for (String keyVal : responseMap.keySet()) {
                             if (keyVal == 'key') {
@@ -230,12 +227,12 @@ public with sharing class OwlinEntitiesManagementController {
                             }
                             if (keyVal == 'stats') {
                                 Object statsObject = responseMap.get(keyVal);
-                                Map<String, Object> statsMap = jsonShuffle(statsObject);
+                                Map<String, Object> statsMap = OwlinEntitiesHandler.getJsonDesialzedMap(statsObject);
                                 if (statsMap != null) {
                                     for (String statsKey : statsMap.keySet()) {
                                         if (statsKey.equalsIgnoreCase(filter)) {
                                             Object filterNewsObj = statsMap.get(statsKey);
-                                            Map<String, Object> filterNewsMap = jsonShuffle(filterNewsObj);
+                                            Map<String, Object> filterNewsMap = OwlinEntitiesHandler.getJsonDesialzedMap(filterNewsObj);
                                             system.debug('filterNewsMap >>>'+filterNewsMap);
                                             for(String filterNews : filterNewsMap.keySet()){
                                                 system.debug('filterNews >'+filterNewsMap.get(filterNews));
@@ -255,7 +252,23 @@ public with sharing class OwlinEntitiesManagementController {
                         if (!topNewRequest.containsKey(entityKey)) topNewRequest.put(entityKey,articles);
                     }
                 }
-                system.debug('topNewRequest >>' + JSON.serialize(topNewRequest));
+                if(topNewRequest!= null && topNewRequest.size() > 0) {
+                    Map<String, Object> requestToSerialize = new Map<String, Object>{'timelines' => topNewRequest};
+                    String serializedString =  JSON.serialize(requestToSerialize);
+                    String topNewsResponse = OwlinEntitiesHandler.getTopNewsData(serializedString);
+                    Map<String,Object> topNewsMap = (Map<String,Object>)JSON.deserializeUntyped(topNewsResponse);
+                    List<Object> responseObj = new List<Object>();
+                    for(String topNews : topNewsMap.keySet()){
+                        List<Object> articleTopNewsList = (List<Object>)topNewsMap.get(topNews);
+                        if(articleTopNewsList!=null && articleTopNewsList.size() > 0){
+                            for(Object articleTopNews : articleTopNewsList){
+                                responseObj.add(articleTopNews);
+                            }
+                        }
+                    }
+                    system.debug('responseObj  '+responseObj);
+                    response.put('values', responseObj);
+                }
 
             } catch (Exception e) {
                 AuraHandledException auraException = new AuraHandledException(Label.Error);

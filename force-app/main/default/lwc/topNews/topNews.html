@@ -1,30 +1,38 @@
 <template>
-    <div class="slds-card">
+    <lightning-card title={topNewstitle}>
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </template>
-        <div class="slds-p-around_medium lgc-bg">
+        {title}
+        <div class="lgc-bg">
             <ul class="slds-has-dividers_bottom-space">
-                <template for:each={topnews} for:item="top">
-                    <li key={top.score} class="slds-item">
-                        <lightning-tile href="#" type="media">
-                            <div>
-                                <span style={headerColorToDisplay}>{top.header}&nbsp;</span>
-<!--                                <div class="tooltip">
-                                    <lightning-button-icon icon-name="standard:link" variant="container" alternative-text="Settings" onmouseover={tooltipfunc}></lightning-button-icon></lightning-icon>
-                                    <div class="tooltiptext">
-                                        test tool tip
+                <template for:each={topNewsServer} for:item="topNewsItem">
+                        <li key={topNewsItem.key} class="slds-item">
+                            <lightning-tile href="#" type="media">
+                                <div>
+                                    <span style={headerColorToDisplay}>{topNewsItem.props.header}&nbsp;</span>
+    <!--                                <div class="tooltip">
+                                        <lightning-button-icon icon-name="standard:link" variant="container" alternative-text="Settings" onmouseover={tooltipfunc}></lightning-button-icon></lightning-icon>
+                                        <div class="tooltiptext">
+                                            test tool tip
 
                                     </div>
                                 </div>-->
-                            </div>
-                            <p class="slds-truncate" title="7 Members">
-                                <span>3 hours ago</span> via <span>{top.url}</span></p>
-                            <div class="owlin-dashboard-ui-topnews-item-article-keywords"><div style={tagColorToDisplay} class="owlin-ui-label">money laundering</div><div style={tagColorToDisplay} class="owlin-ui-label">escandalo</div></div>
-                        </lightning-tile>
-                    </li>
+                                </div>
+                                <p class="slds-truncate" title="relative time">
+                                    <span>
+                                        <!-- passing property to child-->
+                                        <c-relative-date-time epoch-date={topNewsItem.props.epoch}></c-relative-date-time>
+                                    </span> via <span>{topNewsItem.props.domain}</span></p>
+                                <div class="owlin-dashboard-ui-topnews-item-article-keywords">
+                                    <template for:each={topNewsItem.props.hits.all} for:item="tagList">
+                                        <div key={tagList}  style={tagColorToDisplay} class="owlin-ui-label">{tagList}</div>
+                                    </template>
+                                </div>
+                            </lightning-tile>
+                        </li>
                 </template>
             </ul>
         </div>
-    </div>
+    </lightning-card>
 </template>

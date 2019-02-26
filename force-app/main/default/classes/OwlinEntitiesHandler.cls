@@ -214,4 +214,43 @@ public with sharing class OwlinEntitiesHandler {
         return owlinConfigList;
     }
 
+    /**
+     * deserialize json and return key value
+     *
+     * @param obj
+     *
+     * @return
+     */
+    public static Map<String, Object> getJsonDesialzedMap(Object obj) {
+        String jsonString = JSON.serialize(obj);
+        return (Map<String, Object>) JSON.deserializeUntyped(jsonString);
+    }
+
+    /**
+     * get the top news data
+     *
+     * @return boolean
+     */
+    public static String getTopNewsData(String requestedString){
+        String topNewResponse = null;
+        List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+        if(owlinConfigList!=null && requestedString!=null) {
+            try {
+                system.debug('input json >>>'+requestedString);
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = (owlinConfigList[0].Endpoint__c.indexOf('https')!= -1 ? owlinConfigList[0].Endpoint__c: 'https://' + owlinConfigList[0].Endpoint__c) + 'jobs/salesforce/versions/production/events';
+                client.post(endpointString,requestedString, owlinConfigList[0].Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    topNewResponse = httpResponse.getBody();
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while getting top news ' + e.getMessage());
+                throw e;
+            }
+        }
+        return topNewResponse;
+    }
+
 }

@@ -47,7 +47,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             this.bubbleData = {children: JSON.parse(data.values)};
             this.bubbleChart(this);
         } else if (error) {
-            this.errorToast(error.message);
+            this.errorToast(error.body.message);
             this.accounts = undefined;
         }
     }
@@ -241,9 +241,10 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
      * Show error toast with message 
      */ 
     errorToast(message) {
+        console.log('message >>'+message);
         this.dispatchEvent(
             new ShowToastEvent({
-                title: this.label.Error_Title,
+                title: this.title +' - '+this.label.Error_Title,
                 message: message,
                 variant: 'error'
             })

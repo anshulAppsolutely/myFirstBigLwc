@@ -11,6 +11,7 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AppPage, lightning__HomePage, lightning__RecordPage">
+            <property name="topNewstitle" type="String" default="Your Accounts: Top News" label="Title" />
             <property name="tagColor" type="String" default="#1f77b4"  label="Tag Colour"/>
             <property name="headerColor" type="String" default="#1f77b4" label="Header Colour" />
             <property name="topNewsKey" type="String" default="topnews:month" label="Owlin Default Top News Filter Key" />
