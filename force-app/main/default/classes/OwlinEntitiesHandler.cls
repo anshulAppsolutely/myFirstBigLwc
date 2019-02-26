@@ -112,7 +112,7 @@ public with sharing class OwlinEntitiesHandler {
                 for(Account account : [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Owlin_Entity_Id__c!=null
-                ORDER BY CreatedDate DESC LIMIT 100]){
+                ORDER BY LastModifiedDate DESC LIMIT 100]){
                     keys.add(account.Owlin_Entity_Id__c);
                 }
                 Map<String, Set<String>> jsonMap = new Map<String, Set<String>>();
