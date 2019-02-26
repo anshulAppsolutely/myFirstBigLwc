@@ -217,45 +217,45 @@ public with sharing class OwlinEntitiesManagementController {
                 String timeline = (String) timelineResponse.get('values');
                 system.debug('timeline in top new >>' + timeline);
                 List<Object> objm = (List<Object>) JSON.deserializeUntyped(timeline);
-                system.debug('aaa' + objm);
                 Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
 
-
                 for (Object responseObject : objm) {
-                    String resObjString = JSON.serialize(responseObject);
-                    if (resObjString != null) {
-                        Map<String, Object> resObjMap = (Map<String, Object>) JSON.deserializeUntyped(resObjString);
-                        for (String keyVal : resObjMap.keySet()) {
-                            String entityKey;
+                    String entityKey;
+                    List<String> articles = new List<String>();
+                    Map<String, Object> responseMap = jsonShuffle(responseObject);
+                    if (responseMap != null) {
+                        for (String keyVal : responseMap.keySet()) {
                             if (keyVal == 'key') {
-                                entityKey = (String) resObjMap.get(keyVal);
-                                if (!topNewRequest.containsKey(entityKey)) topNewRequest.put((String) resObjMap.get(keyVal), new List<String>());
+                                entityKey = (String) responseMap.get(keyVal);
                             }
-
                             if (keyVal == 'stats') {
-                                Object statsObject = resObjMap.get(keyVal);
-                                String jsonObject = JSON.serialize(statsObject);
-                                if (jsonObject != null) {
-                                    Map<String, Object> statsMap = (Map<String, Object>) JSON.deserializeUntyped(jsonObject);
-                                    system.debug('statsMap >>' + statsMap);
-                                    if (statsMap != null) {
-                                        for (String keyval1 : statsMap.keySet()) {
-                                            if (keyval1 == 'topnews:month') {
-                                                Object topNews = (Object) statsMap.get(keyval1);
-                                                String topNewsObject = JSON.serialize(topNews);
-                                                Map<String, Object> topNewsMap = (Map<String, Object>) JSON.deserializeUntyped(topNewsObject);
-                                                System.debug('topNews: ' + topNewsMap);
+                                Object statsObject = responseMap.get(keyVal);
+                                Map<String, Object> statsMap = jsonShuffle(statsObject);
+                                if (statsMap != null) {
+                                    for (String statsKey : statsMap.keySet()) {
+                                        if (statsKey.equalsIgnoreCase(filter)) {
+                                            Object filterNewsObj = statsMap.get(statsKey);
+                                            Map<String, Object> filterNewsMap = jsonShuffle(filterNewsObj);
+                                            system.debug('filterNewsMap >>>'+filterNewsMap);
+                                            for(String filterNews : filterNewsMap.keySet()){
+                                                system.debug('filterNews >'+filterNewsMap.get(filterNews));
+                                                List<Object> resultslist = (List<Object>)filterNewsMap.get(filterNews);
+                                                for(Object mapa:resultslist ){
+                                                    Map<String,Object> tempMap = (Map<String,Object>)mapa;
+                                                    String articleId = (String)tempMap.get('urlhash');
+                                                    system.debug('articleId '+tempMap.get('urlhash'));
+                                                    articles.add(articleId);
+                                                }
                                             }
-
                                         }
-
                                     }
                                 }
                             }
                         }
+                        if (!topNewRequest.containsKey(entityKey)) topNewRequest.put(entityKey,articles);
                     }
                 }
-                system.debug('topNewRequest >>' + topNewRequest);
+                system.debug('topNewRequest >>' + JSON.serialize(topNewRequest));
 
             } catch (Exception e) {
                 AuraHandledException auraException = new AuraHandledException(Label.Error);

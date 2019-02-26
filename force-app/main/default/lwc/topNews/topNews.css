@@ -2,9 +2,9 @@
     background-color: rgb(255, 255, 255);
 }
 
-.header {
+/*.header {
     color: #1f77b4;
-}
+}*/
 
 .lgc-bg-inverse {
     background-color: rgb(22, 50, 92);
@@ -23,7 +23,7 @@
     line-height: 20px;
     margin-top: 4px;
     margin-right: 5px;
-    background: #1f77b4;
+/*    background: #1f77b4;*/
 }
 
 /*.tooltip {

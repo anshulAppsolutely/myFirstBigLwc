@@ -9,7 +9,7 @@
                     <li key={top.score} class="slds-item">
                         <lightning-tile href="#" type="media">
                             <div>
-                                <span class="header">{top.header}&nbsp;</span>
+                                <span style={headerColorToDisplay}>{top.header}&nbsp;</span>
 <!--                                <div class="tooltip">
                                     <lightning-button-icon icon-name="standard:link" variant="container" alternative-text="Settings" onmouseover={tooltipfunc}></lightning-button-icon></lightning-icon>
                                     <div class="tooltiptext">
@@ -20,7 +20,7 @@
                             </div>
                             <p class="slds-truncate" title="7 Members">
                                 <span>3 hours ago</span> via <span>{top.url}</span></p>
-                            <div class="owlin-dashboard-ui-topnews-item-article-keywords"><div class="owlin-ui-label">money laundering</div><div class="owlin-ui-label">escandalo</div></div>
+                            <div class="owlin-dashboard-ui-topnews-item-article-keywords"><div style={tagColorToDisplay} class="owlin-ui-label">money laundering</div><div style={tagColorToDisplay} class="owlin-ui-label">escandalo</div></div>
                         </lightning-tile>
                     </li>
                 </template>

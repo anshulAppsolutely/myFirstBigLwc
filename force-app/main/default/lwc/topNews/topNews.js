@@ -1,4 +1,5 @@
 import { LightningElement, track , api, wire} from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTopNewsData from '@salesforce/apex/OwlinEntitiesManagementController.getTopNewsData';
 
 export default class TopNews extends LightningElement {
@@ -17,9 +18,9 @@ export default class TopNews extends LightningElement {
     @track
     loading = true;
 
-    //get headerColorToDisplay () {return 'color:$headerColor'}
+    get headerColorToDisplay () {return 'color:'+this.headerColor}
 
-    //get tagColorToDisplay () {return 'background-color:$tagColor'}
+    get tagColorToDisplay () {return 'background-color:'+this.tagColor}
 
     /** Get accounts from Apex */
     @wire(getTopNewsData, {filter: '$topNewsKey'})
