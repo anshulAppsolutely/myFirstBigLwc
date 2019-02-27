@@ -240,6 +240,7 @@ public with sharing class OwlinEntitiesHandler {
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
                 String endpointString = (owlinConfigList[0].Endpoint__c.indexOf('https')!= -1 ? owlinConfigList[0].Endpoint__c: 'https://' + owlinConfigList[0].Endpoint__c) + 'jobs/salesforce/versions/production/events';
+                if(Test.isRunningTest()) endpointString = 'topNewsTestEndPoint';
                 client.post(endpointString,requestedString, owlinConfigList[0].Token__c);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {

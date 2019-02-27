@@ -193,6 +193,7 @@ public with sharing class OwlinEntitiesManagementController {
             response.put('values', timelineResponse);
             
         }catch(Exception e){
+            system.debug('exception in getting bubbles '+e.getMessage());
             AuraHandledException auraException = new AuraHandledException(Label.Error);
             auraException.setMessage(Label.Error);
             throw auraException;
@@ -206,14 +207,17 @@ public with sharing class OwlinEntitiesManagementController {
     public static Map<String, Object> getTopNewsData(String filter) {
         Map<String, Object> response = new Map<String, Object>();
         system.debug('filter >>>'+filter);
+        List<Account> accessibleAccounts;
         if(!String.isBlank(filter)) {
             try {
                 //method is cached
-                Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountForBubble();
-                system.debug('timelineResponse  from bubble>>' + timelineResponse);
-                String timeline = (String) timelineResponse.get('values');
-                system.debug('timeline in top new >>' + timeline);
-                List<Object> objm = (List<Object>) JSON.deserializeUntyped(timeline);
+                Map<String, Object> bubbleResponse = OwlinEntitiesManagementController.getAccountForBubble();
+                system.debug('timelineResponse  from bubble>>' + bubbleResponse);
+                String timelineResponse = (String) bubbleResponse.get('values');
+                accessibleAccounts = (List<Account>)bubbleResponse.get('accounts');
+                system.debug('timeline in top new >>' + timelineResponse);
+
+                List<Object> objm = (List<Object>) JSON.deserializeUntyped(timelineResponse);
                 Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
 
                 for (Object responseObject : objm) {
@@ -252,26 +256,30 @@ public with sharing class OwlinEntitiesManagementController {
                         if (!topNewRequest.containsKey(entityKey)) topNewRequest.put(entityKey,articles);
                     }
                 }
+                system.debug('topNewRequest >>>'+topNewRequest);
                 if(topNewRequest!= null && topNewRequest.size() > 0) {
                     Map<String, Object> requestToSerialize = new Map<String, Object>{'timelines' => topNewRequest};
+                    system.debug('requestToSerialize >>>'+requestToSerialize);
                     String serializedString =  JSON.serialize(requestToSerialize);
                     String topNewsResponse = OwlinEntitiesHandler.getTopNewsData(serializedString);
                     Map<String,Object> topNewsMap = (Map<String,Object>)JSON.deserializeUntyped(topNewsResponse);
-                    List<Object> responseObj = new List<Object>();
+                    List<Object> topNewsResponseObj = new List<Object>();
                     for(String topNews : topNewsMap.keySet()){
                         List<Object> articleTopNewsList = (List<Object>)topNewsMap.get(topNews);
                         if(articleTopNewsList!=null && articleTopNewsList.size() > 0){
                             for(Object articleTopNews : articleTopNewsList){
-                                responseObj.add(articleTopNews);
+                                topNewsResponseObj.add(articleTopNews);
                             }
                         }
                     }
 
-                    system.debug('responseObj  '+responseObj);
-                    response.put('values', responseObj);
+                    system.debug('topNewsResponseObj  '+topNewsResponseObj);
+                    response.put('values', topNewsResponseObj);
+                    response.put('accounts', accessibleAccounts);
                 }
 
             } catch (Exception e) {
+                system.debug('exception in getting top news '+e.getMessage());
                 AuraHandledException auraException = new AuraHandledException(Label.Error);
                 auraException.setMessage(Label.Error);
                 throw auraException;

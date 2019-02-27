@@ -4,6 +4,7 @@ import getTopNewsData from '@salesforce/apex/OwlinEntitiesManagementController.g
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
+import SVG_URL from '@salesforce/resourceUrl/owlin';
 
 export default class TopNews extends LightningElement {
 
@@ -14,6 +15,9 @@ export default class TopNews extends LightningElement {
     tagColor;
 
     @api
+    accountTitleColor;
+
+    @api
     headerColor;
 
     @api
@@ -21,6 +25,9 @@ export default class TopNews extends LightningElement {
 
     @track
     topNewsServer;
+
+    @track
+    accounts;
 
     @track
     loading = true;
@@ -34,36 +41,22 @@ export default class TopNews extends LightningElement {
 
     get tagColorToDisplay () {return 'background-color:'+this.tagColor}
 
+    Sfdcimage1 = SVG_URL + '/owlin-ico.svg';
+
     /** Get accounts from Apex */
     @wire(getTopNewsData, {filter: '$topNewsKey'})
-    wiredBubbleResponse({ error, data }) {
+    wiredTopNewsResponse({ error, data }) {
         if (data) {
             this.loading = false;
-            if(data!=null )this.topNewsServer = data.values;
-            console.log('topNewsServer >>');
-            var employees= [this.topNewsServer];
-            console.log(employees.sort(this.compareObjects));
-            //console.log(this.outputProxy(this.topNewsServer));
-            //console.log('aaaa '+this.outputProxy(employees));
+            if(data!=null )this.topNewsServer = data.values.slice().sort(this.compareObjects);
+            this.accounts = data.accounts;
         } else if (error){
             this.errorToastTopNews(error.body.message);
         }
     }
 
-    //todo check with Dan
     compareObjects(a, b){
-        return a.event_at - b.event_at;
-    }
-
-    outputProxy(record) {
-        var obj = {};
-        for(var propt in record) {
-            obj[propt] = record[propt];
-            if (typeof(record[propt]) == 'object') {
-                obj[propt] = this.outputProxy(record[propt]);
-            }
-        }
-        return obj;
+        return b.event_at - a.event_at;
     }
 
     /**

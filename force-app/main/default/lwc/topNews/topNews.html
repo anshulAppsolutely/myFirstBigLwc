@@ -3,14 +3,15 @@
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </template>
-        {title}
+         <lightning-icon src={Sfdcimage1} alternative-text="emoji"></lightning-icon>
         <div class="lgc-bg">
             <ul class="slds-has-dividers_bottom-space">
                 <template for:each={topNewsServer} for:item="topNewsItem">
                         <li key={topNewsItem.key} class="slds-item">
                             <lightning-tile href="#" type="media">
-                                <div>
-                                    <span style={headerColorToDisplay}>{topNewsItem.props.header}&nbsp;</span>
+                                <c-account-title accounts-list={accounts} entity-id={topNewsItem.timeline} title-color={accountTitleColor}></c-account-title>
+                                <div class="slds-truncate">
+                                    <span style={headerColorToDisplay}><a href={topNewsItem.props.url} target=_blank>{topNewsItem.props.header}</a></span>
                                 </div>
                                 <p class="slds-truncate" title="relative time">
                                     <span>
