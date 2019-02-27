@@ -41,10 +41,18 @@ export default class TopNews extends LightningElement {
             this.loading = false;
             if(data!=null )this.topNewsServer = data.values;
             console.log('topNewsServer >>');
-            console.log(this.outputProxy(this.topNewsServer));
-        } else if (error) {
+            var employees= [this.topNewsServer];
+            console.log(employees.sort(this.compareObjects));
+            //console.log(this.outputProxy(this.topNewsServer));
+            //console.log('aaaa '+this.outputProxy(employees));
+        } else if (error){
             this.errorToastTopNews(error.body.message);
         }
+    }
+
+    //todo check with Dan
+    compareObjects(a, b){
+        return a.event_at - b.event_at;
     }
 
     outputProxy(record) {
