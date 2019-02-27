@@ -4,7 +4,7 @@ import getTopNewsData from '@salesforce/apex/OwlinEntitiesManagementController.g
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
-import SVG_URL from '@salesforce/resourceUrl/owlin';
+import SVG_URL from '@salesforce/resourceUrl/Images';
 
 export default class TopNews extends LightningElement {
 
@@ -41,7 +41,7 @@ export default class TopNews extends LightningElement {
 
     get tagColorToDisplay () {return 'background-color:'+this.tagColor}
 
-    Sfdcimage1 = SVG_URL + '/owlin-ico.svg';
+    Sfdcimage1 = SVG_URL + '/owlin/owlin-ico.svg';
 
     /** Get accounts from Apex */
     @wire(getTopNewsData, {filter: '$topNewsKey'})
