@@ -241,7 +241,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
      * Show error toast with message 
      */ 
     errorToast(message) {
-        console.log('message >>'+message);
+        //console.log('message >>'+message);
         this.dispatchEvent(
             new ShowToastEvent({
                 title: this.title +' - '+this.label.Error_Title,

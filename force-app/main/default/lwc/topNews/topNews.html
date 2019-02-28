@@ -1,9 +1,11 @@
 <template>
     <lightning-card title={topNewstitle}>
+        <div>
+            <img class="owlin-image" src={poweredBy}>
+        </div>
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </template>
-         <lightning-icon src={Sfdcimage1} alternative-text="emoji"></lightning-icon>
         <div class="lgc-bg">
             <ul class="slds-has-dividers_bottom-space">
                 <template for:each={topNewsServer} for:item="topNewsItem">

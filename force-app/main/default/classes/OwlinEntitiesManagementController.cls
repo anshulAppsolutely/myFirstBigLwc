@@ -188,7 +188,7 @@ public with sharing class OwlinEntitiesManagementController {
             List<Account> accessibleAccounts = [SELECT
                     Id, Name, Owlin_Entity_Id__c
             FROM Account
-            WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC];
+            WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC limit 100];
             response.put('accounts', accessibleAccounts);
             response.put('values', timelineResponse);
             
@@ -237,14 +237,14 @@ public with sharing class OwlinEntitiesManagementController {
                                         if (statsKey.equalsIgnoreCase(filter)) {
                                             Object filterNewsObj = statsMap.get(statsKey);
                                             Map<String, Object> filterNewsMap = OwlinEntitiesHandler.getJsonDesialzedMap(filterNewsObj);
-                                            system.debug('filterNewsMap >>>'+filterNewsMap);
+                                            //system.debug('filterNewsMap >>>'+filterNewsMap);
                                             for(String filterNews : filterNewsMap.keySet()){
-                                                system.debug('filterNews >'+filterNewsMap.get(filterNews));
+                                                //system.debug('filterNews >'+filterNewsMap.get(filterNews));
                                                 List<Object> resultslist = (List<Object>)filterNewsMap.get(filterNews);
                                                 for(Object mapa:resultslist ){
                                                     Map<String,Object> tempMap = (Map<String,Object>)mapa;
                                                     String articleId = (String)tempMap.get('urlhash');
-                                                    system.debug('articleId '+tempMap.get('urlhash'));
+                                                    //system.debug('articleId '+tempMap.get('urlhash'));
                                                     articles.add(articleId);
                                                 }
                                             }

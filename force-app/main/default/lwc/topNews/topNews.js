@@ -41,14 +41,14 @@ export default class TopNews extends LightningElement {
 
     get tagColorToDisplay () {return 'background-color:'+this.tagColor}
 
-    Sfdcimage1 = SVG_URL + '/owlin/owlin-ico.svg';
+    poweredBy = SVG_URL + '/owlin/owlinpower.svg';
 
     /** Get accounts from Apex */
     @wire(getTopNewsData, {filter: '$topNewsKey'})
     wiredTopNewsResponse({ error, data }) {
         if (data) {
             this.loading = false;
-            if(data!=null )this.topNewsServer = data.values.slice().sort(this.compareObjects);
+            if(data!=null)this.topNewsServer = data.values.slice().sort(this.compareObjects);
             this.accounts = data.accounts;
         } else if (error){
             this.errorToastTopNews(error.body.message);

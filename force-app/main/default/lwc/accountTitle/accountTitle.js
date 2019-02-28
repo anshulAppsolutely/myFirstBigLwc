@@ -47,7 +47,7 @@ export default class AccountTitle extends NavigationMixin(LightningElement) {
         event.preventDefault();
         event.stopPropagation();
         var i;
-        console.log('clicked >>'+event.target.name+'account list >>'+this._accountsList.length);
+        //console.log('clicked >>'+event.target.name+'account list >>'+this._accountsList.length);
         for (i = 0; i < this._accountsList.length; i++) {
             //console.log(this._accountsList[i].Name);
             if (event.target.name === this._accountsList[i].Name) {
@@ -62,7 +62,7 @@ export default class AccountTitle extends NavigationMixin(LightningElement) {
                 });
                 return;
             }
-            console.log('here ');
+            //console.log('here ');
         }
     }
 
