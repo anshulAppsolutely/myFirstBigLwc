@@ -1,34 +1,39 @@
 <template>
     <lightning-card title={topNewstitle}>
-        <div>
-            <img class="owlin-image" src={poweredBy}>
-        </div>
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </template>
-        <div class="lgc-bg">
-            <ul class="slds-has-dividers_bottom-space">
-                <template for:each={topNewsServer} for:item="topNewsItem">
-                        <li key={topNewsItem.key} class="slds-item">
-                            <lightning-tile href="#" type="media">
-                                <c-account-title accounts-list={accounts} entity-id={topNewsItem.timeline} title-color={accountTitleColor}></c-account-title>
-                                <div class="slds-truncate">
-                                    <span style={headerColorToDisplay}><a href={topNewsItem.props.url} target=_blank>{topNewsItem.props.header}</a></span>
-                                </div>
-                                <p class="slds-truncate" title="relative time">
-                                    <span>
-                                        <!-- passing property to child-->
-                                        <c-relative-date-time epoch-date={topNewsItem.props.epoch}></c-relative-date-time>
-                                    </span> via <span>{topNewsItem.props.domain}</span></p>
-                                <div class="owlin-dashboard-ui-topnews-item-article-keywords">
-                                    <template for:each={topNewsItem.props.hits.all} for:item="tagList">
-                                        <div key={tagList}  style={tagColorToDisplay} class="owlin-ui-label">{tagList}</div>
-                                    </template>
-                                </div>
-                            </lightning-tile>
-                        </li>
-                </template>
-            </ul>
-        </div>
+        <template if:false={displayTopNews}>
+            <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
+        </template>
+        <template if:true={displayTopNews}>
+            <div>
+                <img class="owlin-image" src={poweredBy}>
+            </div>
+            <div class="lgc-bg">
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={topNewsServer} for:item="topNewsItem">
+                            <li key={topNewsItem.key} class="slds-item">
+                                <lightning-tile href="#" type="media">
+                                    <c-account-title accounts-list={accounts} entity-id={topNewsItem.timeline} title-color={accountTitleColor}></c-account-title>
+                                    <div class="slds-truncate">
+                                        <span style={headerColorToDisplay}><a href={topNewsItem.props.url} target=_blank>{topNewsItem.props.header}</a></span>
+                                    </div>
+                                    <p class="slds-truncate" title="relative time">
+                                        <span>
+                                            <!-- passing property to child-->
+                                            <c-relative-date-time epoch-date={topNewsItem.props.epoch}></c-relative-date-time>
+                                        </span> via <span>{topNewsItem.props.domain}</span></p>
+                                    <div class="owlin-dashboard-ui-topnews-item-article-keywords">
+                                        <template for:each={topNewsItem.props.hits.all} for:item="tagList">
+                                            <div key={tagList}  style={tagColorToDisplay} class="owlin-ui-label">{tagList}</div>
+                                        </template>
+                                    </div>
+                                </lightning-tile>
+                            </li>
+                    </template>
+                </ul>
+            </div>
+        </template>
     </lightning-card>
 </template>

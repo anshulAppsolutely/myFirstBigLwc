@@ -136,7 +136,12 @@ public with sharing class OwlinEntitiesManagementController {
         }
         return null;
     }
-    
+
+    /**
+     * this method is used to generate the bubble chart and make api call to owlin
+     *
+     * @return
+     */
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getAccountForBubble() {
         String token;
@@ -184,14 +189,12 @@ public with sharing class OwlinEntitiesManagementController {
         try{
             String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
             system.debug('timelineResponse in bubble>>'+timelineResponse);
-            if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
-            List<Account> accessibleAccounts = [SELECT
-                    Id, Name, Owlin_Entity_Id__c
-            FROM Account
-            WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC limit 100];
+            List<Account> accessibleAccounts = OwlinEntitiesHandler.getAccessibleAccounts();
             response.put('accounts', accessibleAccounts);
             response.put('values', timelineResponse);
-            
+            response.put('token', token);
+            //save token now after http calls are done and if new token was requested
+            if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
         }catch(Exception e){
             system.debug('exception in getting bubbles '+e.getMessage());
             AuraHandledException auraException = new AuraHandledException(Label.Error);
@@ -201,21 +204,56 @@ public with sharing class OwlinEntitiesManagementController {
         return response;
     }
 
-
-
+    /**
+     * this method is used to get the topnews data
+     * the request is created from bubble data with entities as keys as list of article ids
+     *
+     * @param filter
+     *
+     * @return
+     */
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getTopNewsData(String filter) {
         Map<String, Object> response = new Map<String, Object>();
         system.debug('filter >>>'+filter);
-        List<Account> accessibleAccounts;
+        String token;
+        Boolean isTokenNew = false;
         if(!String.isBlank(filter)) {
-            try {
-                //method is cached
-                Map<String, Object> bubbleResponse = OwlinEntitiesManagementController.getAccountForBubble();
-                system.debug('timelineResponse  from bubble>>' + bubbleResponse);
-                String timelineResponse = (String) bubbleResponse.get('values');
-                accessibleAccounts = (List<Account>)bubbleResponse.get('accounts');
-                system.debug('timeline in top new >>' + timelineResponse);
+            //check for any filters
+            //check backend configurations
+            system.debug('getting timeline from aura >>>');
+            List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+            if (owlinConfigList == null || owlinConfigList.size() == 0) {
+                AuraHandledException auraException = new AuraHandledException(Label.Error_NoOwlinConfig);
+                auraException.setMessage(Label.Error_NoOwlinConfig);
+                throw auraException;
+            }
+            Date today = System.Today();
+            if (owlinConfigList != null && owlinConfigList.size() > 0
+                    && owlinConfigList[0] != null
+                    && owlinConfigList[0].Token__c != null
+                    && owlinConfigList[0].Token_Expiry_Date__c > today) {
+                token = owlinConfigList[0].Token__c;
+            }
+            //check for valid token or expiry
+            //if token is not valid get the new token first
+            if (owlinConfigList != null && owlinConfigList.size() > 0
+                    && owlinConfigList[0] != null
+                    && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
+                system.debug('requesting API token from linkAccountsToOwlin');
+                token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+                isTokenNew = true;
+            }
+
+            if (token == null) {
+                AuraHandledException auraException = new AuraHandledException(Label.Error_APITokenError);
+                auraException.setMessage(Label.Error_APITokenError);
+                throw auraException;
+            }
+            try{
+                //get timeline data for making topnews request
+                String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
+                system.debug('timelineResponse in top news >>'+timelineResponse);
 
                 List<Object> objm = (List<Object>) JSON.deserializeUntyped(timelineResponse);
                 Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
@@ -261,7 +299,7 @@ public with sharing class OwlinEntitiesManagementController {
                     Map<String, Object> requestToSerialize = new Map<String, Object>{'timelines' => topNewRequest};
                     system.debug('requestToSerialize >>>'+requestToSerialize);
                     String serializedString =  JSON.serialize(requestToSerialize);
-                    String topNewsResponse = OwlinEntitiesHandler.getTopNewsData(serializedString);
+                    String topNewsResponse = OwlinEntitiesHandler.getTopNewsData(serializedString,owlinConfigList[0], token);
                     Map<String,Object> topNewsMap = (Map<String,Object>)JSON.deserializeUntyped(topNewsResponse);
                     List<Object> topNewsResponseObj = new List<Object>();
                     for(String topNews : topNewsMap.keySet()){
@@ -275,7 +313,10 @@ public with sharing class OwlinEntitiesManagementController {
 
                     system.debug('topNewsResponseObj  '+topNewsResponseObj);
                     response.put('values', topNewsResponseObj);
+                    List<Account> accessibleAccounts = OwlinEntitiesHandler.getAccessibleAccounts();
                     response.put('accounts', accessibleAccounts);
+                    //save token now after http calls are done
+                    if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
                 }
 
             } catch (Exception e) {

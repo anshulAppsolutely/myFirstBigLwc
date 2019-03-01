@@ -231,17 +231,16 @@ public with sharing class OwlinEntitiesHandler {
      *
      * @return boolean
      */
-    public static String getTopNewsData(String requestedString){
+    public static String getTopNewsData(String requestedString, final Configuration_Settings__c owlinConfig, String token){
         String topNewResponse = null;
-        List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
-        if(owlinConfigList!=null && requestedString!=null) {
+        if(owlinConfig!=null && requestedString!=null) {
             try {
                 system.debug('input json >>>'+requestedString);
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
-                String endpointString = (owlinConfigList[0].Endpoint__c.indexOf('https')!= -1 ? owlinConfigList[0].Endpoint__c: 'https://' + owlinConfigList[0].Endpoint__c) + 'jobs/salesforce/versions/production/events';
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/events';
                 if(Test.isRunningTest()) endpointString = 'topNewsTestEndPoint';
-                client.post(endpointString,requestedString, owlinConfigList[0].Token__c);
+                client.post(endpointString,requestedString, token!=null ? token: owlinConfig.Token__c);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
                     topNewResponse = httpResponse.getBody();
@@ -252,6 +251,18 @@ public with sharing class OwlinEntitiesHandler {
             }
         }
         return topNewResponse;
+    }
+
+    /**
+     * get the list of accessible accounts
+     *
+     * @return boolean
+     */
+    public static List<Account> getAccessibleAccounts(){
+        return [SELECT
+                Id, Name, Owlin_Entity_Id__c
+        FROM Account
+        WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC limit 100];
     }
 
 }

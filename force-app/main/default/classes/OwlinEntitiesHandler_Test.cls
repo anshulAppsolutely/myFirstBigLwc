@@ -144,7 +144,7 @@ private class OwlinEntitiesHandler_Test {
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getTimelines'));
         String requestedString ='{"timelines":{"ca13713c-fcd4-44a7-82ca-fcda6fd96011":["dd45e16ed6a20bc71107b53cc4c43c71","696e4c02dc58de957864f653e64c1a04"]}}';
-        String timelineJson = OwlinEntitiesHandler.getTopNewsData(requestedString);
+        String timelineJson = OwlinEntitiesHandler.getTopNewsData(requestedString,toInsertCustomSettingRecList[0],'testToken');
         System.assert(timelineJson!=null);
         Test.stopTest();
     }
