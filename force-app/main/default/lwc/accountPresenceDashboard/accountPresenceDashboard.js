@@ -8,6 +8,7 @@ import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementControl
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
+import { showToast } from 'c/utils';
 
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
 
@@ -241,13 +242,8 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
      * Show error toast with message 
      */ 
     errorToast(message) {
-        //console.log('message >>'+message);
         this.dispatchEvent(
-            new ShowToastEvent({
-                title: this.title +' - '+this.label.Error_Title,
-                message: message,
-                variant: 'error'
-            })
+            showToast('Error','dismissable',this.title +' - '+this.label.Error_Title, message)
         );
     }
 }

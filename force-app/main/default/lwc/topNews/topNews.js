@@ -1,10 +1,10 @@
 import { LightningElement, track , api, wire} from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTopNewsData from '@salesforce/apex/OwlinEntitiesManagementController.getTopNewsData';
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
 import SVG_URL from '@salesforce/resourceUrl/Images';
+import { showToast } from 'c/utils';
 
 export default class TopNews extends LightningElement {
 
@@ -76,11 +76,7 @@ export default class TopNews extends LightningElement {
      */
     errorToastTopNews(message) {
         this.dispatchEvent(
-            new ShowToastEvent({
-                title: this.topNewstitle +' - '+this.label.Error_Title,
-                message: message,
-                variant: 'error'
-            })
+            showToast('Error','dismissable',this.topNewstitle +' - '+this.label.Error_Title,message)
         );
     }
 
