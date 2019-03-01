@@ -8,6 +8,9 @@
             ],
             "c/d3": [
                 "../staticresources/d3/d3.js"
+            ],
+            "c/account-news-timeline": [
+                "accountNewsTimeline/accountNewsTimeline.js"
             ]
         }
     },

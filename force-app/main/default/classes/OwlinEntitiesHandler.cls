@@ -137,6 +137,43 @@ public with sharing class OwlinEntitiesHandler {
         return timeLineResponse;
     }
 
+    /**
+     * get the entity timeline response
+     *
+     * @return boolean
+     */
+    public static String getSingleEntityTimeline(final Configuration_Settings__c owlinConfig, String token, Id recordId){
+        String timeLineResponse = null;
+        
+        if(owlinConfig!=null) {
+            try {
+                //get all owlin entity that are required
+                Set<String> keys = new Set<String>();
+                List<Account> account = [SELECT
+                        Id, Name, Owlin_Entity_Id__c
+                FROM Account WHERE Id = :recordId];
+                
+                if (account[0].Owlin_Entity_Id__c == null) return '';
+
+            
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/stats/day';
+                System.debug(endpointString);
+                client.get(endpointString, token!=null ? token: owlinConfig.Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    timeLineResponse = httpResponse.getBody();
+                    system.debug('timeLineResponse >>'+timeLineResponse);
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while getting entity timeline ' + e.getMessage());
+                throw e;
+            }
+        }
+        return timeLineResponse;
+    }
+
 
     /**
      * prepare requesting API token
