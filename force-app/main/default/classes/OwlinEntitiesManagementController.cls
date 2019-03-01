@@ -144,6 +144,14 @@ public with sharing class OwlinEntitiesManagementController {
      */
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getAccountForBubble() {
+        //check whether user has permission to read account object
+        try{
+            OwlinDMLManager.checkAccess(accessMapByrecordName);
+        }catch(Exception e){
+            AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
+            auraException.setMessage(Label.Owlin_Permission_Error);
+            throw auraException;
+        }
         String token;
         Map<String, Object> response = new Map<String, Object>();
         Boolean isTokenNew = false;
@@ -178,14 +186,6 @@ public with sharing class OwlinEntitiesManagementController {
             auraException.setMessage(Label.Error_APITokenError);
             throw auraException;
         }
-        //check whether user has permission to read account object
-        try{
-            OwlinDMLManager.checkAccess(accessMapByrecordName);
-        }catch(Exception e){
-            AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
-            auraException.setMessage(Label.Owlin_Permission_Error);
-            throw auraException;
-        }
         try{
             String timelineResponse = OwlinEntitiesHandler.getEntityTimeline(owlinConfigList[0], token);
             system.debug('timelineResponse in bubble>>'+timelineResponse);
@@ -214,6 +214,14 @@ public with sharing class OwlinEntitiesManagementController {
      */
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getTopNewsData(String filter) {
+        //check whether user has permission to read account object
+        try{
+            OwlinDMLManager.checkAccess(accessMapByrecordName);
+        }catch(Exception e){
+            AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
+            auraException.setMessage(Label.Owlin_Permission_Error);
+            throw auraException;
+        }
         Map<String, Object> response = new Map<String, Object>();
         system.debug('filter >>>'+filter);
         String token;
@@ -248,14 +256,6 @@ public with sharing class OwlinEntitiesManagementController {
             if (token == null) {
                 AuraHandledException auraException = new AuraHandledException(Label.Error_APITokenError);
                 auraException.setMessage(Label.Error_APITokenError);
-                throw auraException;
-            }
-            //check whether user has permission to read account object
-            try{
-                OwlinDMLManager.checkAccess(accessMapByrecordName);
-            }catch(Exception e){
-                AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
-                auraException.setMessage(Label.Owlin_Permission_Error);
                 throw auraException;
             }
             try{
@@ -321,8 +321,11 @@ public with sharing class OwlinEntitiesManagementController {
 
                     system.debug('topNewsResponseObj  '+topNewsResponseObj);
                     response.put('values', topNewsResponseObj);
-                    List<Account> accessibleAccounts = OwlinEntitiesHandler.getAccessibleAccounts();
-                    response.put('accounts', accessibleAccounts);
+                    //if there are no articles dont fetch the accounts
+                    if(topNewsResponseObj.size() > 0) {
+                        List<Account> accessibleAccounts = OwlinEntitiesHandler.getAccessibleAccounts();
+                        response.put('accounts', accessibleAccounts);
+                    }
                     //save token now after http calls are done
                     if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
                 }
