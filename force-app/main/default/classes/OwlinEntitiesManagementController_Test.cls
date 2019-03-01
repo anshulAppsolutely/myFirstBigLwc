@@ -30,7 +30,7 @@ private class OwlinEntitiesManagementController_Test {
         insert accountList;
 
     }
-/*
+
     @isTest
     static void likedEntitiesCount(){
         OwlinEntitiesManagementController controller  = new OwlinEntitiesManagementController();
@@ -231,7 +231,7 @@ private class OwlinEntitiesManagementController_Test {
             }
             Test.stopTest();
         }
-    }*/
+    }
 
     @isTest
     static void testTopNewsData() {

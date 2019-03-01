@@ -168,7 +168,7 @@ public with sharing class OwlinEntitiesManagementController {
         if (owlinConfigList != null && owlinConfigList.size() > 0
                 && owlinConfigList[0] != null
                 && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
-            system.debug('requesting API token from linkAccountsToOwlin');
+            system.debug('requesting API token from bubble');
             token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
             isTokenNew = true;
         }
@@ -221,7 +221,7 @@ public with sharing class OwlinEntitiesManagementController {
         if(!String.isBlank(filter)) {
             //check for any filters
             //check backend configurations
-            system.debug('getting timeline from aura >>>');
+            system.debug('getting getTopNewsData from aura >>>');
             List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
             if (owlinConfigList == null || owlinConfigList.size() == 0) {
                 AuraHandledException auraException = new AuraHandledException(Label.Error_NoOwlinConfig);
@@ -240,7 +240,7 @@ public with sharing class OwlinEntitiesManagementController {
             if (owlinConfigList != null && owlinConfigList.size() > 0
                     && owlinConfigList[0] != null
                     && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
-                system.debug('requesting API token from linkAccountsToOwlin');
+                system.debug('requesting API token from getTopNewsData');
                 token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
                 isTokenNew = true;
             }
@@ -248,6 +248,14 @@ public with sharing class OwlinEntitiesManagementController {
             if (token == null) {
                 AuraHandledException auraException = new AuraHandledException(Label.Error_APITokenError);
                 auraException.setMessage(Label.Error_APITokenError);
+                throw auraException;
+            }
+            //check whether user has permission to read account object
+            try{
+                OwlinDMLManager.checkAccess(accessMapByrecordName);
+            }catch(Exception e){
+                AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
+                auraException.setMessage(Label.Owlin_Permission_Error);
                 throw auraException;
             }
             try{
@@ -297,7 +305,7 @@ public with sharing class OwlinEntitiesManagementController {
                 system.debug('topNewRequest >>>'+topNewRequest);
                 if(topNewRequest!= null && topNewRequest.size() > 0) {
                     Map<String, Object> requestToSerialize = new Map<String, Object>{'timelines' => topNewRequest};
-                    system.debug('requestToSerialize >>>'+requestToSerialize);
+                    system.debug('requestToSerialize in topnews >>>'+requestToSerialize);
                     String serializedString =  JSON.serialize(requestToSerialize);
                     String topNewsResponse = OwlinEntitiesHandler.getTopNewsData(serializedString,owlinConfigList[0], token);
                     Map<String,Object> topNewsMap = (Map<String,Object>)JSON.deserializeUntyped(topNewsResponse);
