@@ -19,11 +19,12 @@
                                     <div class="slds-truncate">
                                         <span style={headerColorToDisplay}><a href={topNewsItem.props.url} target=_blank>{topNewsItem.props.header}</a></span>
                                     </div>
-                                    <p class="slds-truncate" title="relative time">
+                                    <p class="slds-truncate" title="">
                                         <span>
                                             <!-- passing property to child-->
                                             <c-relative-date-time epoch-date={topNewsItem.props.epoch}></c-relative-date-time>
-                                        </span> via <span>{topNewsItem.props.domain}</span></p>
+                                        </span> via <span>{topNewsItem.props.domain}</span>
+                                    </p>
                                     <div class="owlin-dashboard-ui-topnews-item-article-keywords">
                                         <template for:each={topNewsItem.props.hits.all} for:item="tagList">
                                             <div key={tagList}  style={tagColorToDisplay} class="owlin-ui-label">{tagList}</div>

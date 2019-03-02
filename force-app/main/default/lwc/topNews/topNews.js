@@ -54,7 +54,7 @@ export default class TopNews extends LightningElement {
             if (data === undefined || data.values.length == 0)
             {
                 this.displayTopNews = false;
-            }else {
+            } else {
                 this.topNewsServer = data.values.slice().sort(this.compareObjects);
                 this.accounts = data.accounts;
                 this.displayTopNews = true;
