@@ -60,8 +60,8 @@ public with sharing class OwlinEntitiesHandler {
         system.debug('linking entities to owlin >>>');
         //call apex batch class to process records
         OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter, tokenString);
-        //set to maximum scope size
-        Database.executeBatch(linkEntities, 200);
+        //defining scope to avoid all out limit, batch is executed in chunks based on scope size.
+        Database.executeBatch(linkEntities, 75);
 
     }
 
