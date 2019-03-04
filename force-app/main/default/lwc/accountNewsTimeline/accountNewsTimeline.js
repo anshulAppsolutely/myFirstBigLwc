@@ -2,12 +2,16 @@ import { LightningElement, api, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import D3Asset from '@salesforce/resourceUrl/d3';
+import MomentAsset from '@salesforce/resourceUrl/moment';
 import { NavigationMixin } from 'lightning/navigation';
 import getChartData from '@salesforce/apex/OwlinEntitiesManagementController.getAccountTimeline';
 
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
+import Chart_Label_Months from '@salesforce/label/c.Chart_Label_Months';
+import Chart_Label_Week from '@salesforce/label/c.Chart_Label_Week';
+
 
 export default class AccountNewsTimeline extends NavigationMixin(LightningElement) {
     @api
@@ -39,6 +43,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     label = {
         Error_Title,
         Error_NoData,
+        Chart_Label_Week,
+        Chart_Label_Months
     };
 
     /** Get accounts from Apex */
@@ -55,6 +61,16 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         this.renderChart(this);
     }
 
+    formatData(stats_per_hour) {
+        // Data is retrieved in hourly grouping and re-grouped on defined period using momentjs:
+        let stats_per_day = {}; stats_per_hour.forEach( stat => {
+            let k = moment( stat.stats_at * 1000 ).startOf(this.period).unix();
+            stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
+            stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
+         });
+        return Object.values(stats_per_day);
+    }
+
     /**
      * ensures that the page loads and renders
      * the container before the graph is created
@@ -68,7 +84,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         //load the scripts
         Promise.all([
             loadScript(this, D3Asset + '/d3.V5.min.js'),
-            loadStyle(this, D3Asset + '/style.css'),
+            loadScript(this, MomentAsset + '/moment-with-locales.min.js'),
+            loadStyle(this, D3Asset + '/style.css')
         ]).then(() => {
             //initialize the graph if data created
             this.renderChart(this);
@@ -102,8 +119,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         var container = c;
 
         // Do not render prematurely.
-        if (!this.chartData || typeof(d3) === 'undefined' || !d3) return;
-        
+        if (!this.chartData || typeof(d3) === 'undefined' || !d3 || typeof(moment) === 'undefined' || !moment) return;
+
         // Only load if there is something to display.
         if (this.chartData.children.length < 1) {
             container.hideChart();
@@ -135,13 +152,13 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
                 "translate(" + margin.left + "," + margin.top + ")");
 
         // reverse data so that most recent dates are on the right
-        data = this.chartData.children;
+        data = container.formatData(this.chartData.children);
 
         // Set the range of both axis
         x.domain(data.map(function (d) {
             return getXLabel(d);
         }));
-        y.domain([0, d3.max(data, function (d) { return d.stats.all; })]);
+        y.domain([0, d3.max(data, function (d) { return (d.stats && d.stats.all ? d.stats.all : 0); })]);
 
         // Add the bars
         svg.selectAll(".bar")
@@ -151,8 +168,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .attr('fill', this.itemColor)
             .attr("x", function (d) { return x(getXLabel(d)); })
             .attr("width", x.bandwidth())
-            .attr("y", function (d) { return y(d.stats.all); })
-            .attr("height", function (d) { return height - y(d.stats.all); })
+            .attr("y", function (d) { return d.stats && d.stats.all ? y(d.stats.all) : 0; })
+            .attr("height", function (d) { return height - (d.stats && d.stats.all ? y(d.stats.all) : 0); })
             .on('click', function (d) { container.clickAction(d.stats_at) }); // Add onclick action binding
 
         // add the x Axis
@@ -163,18 +180,19 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         // add the y Axis
         svg.append("g")
             .attr("class", "yaxis")
-            .call(d3.axisLeft(y).tickFormat(d3.format(".0s")));
+            .call(d3.axisLeft(y).tickFormat(d3.format(".0s")).ticks(3));
 
         // Remove some ticks (we only want whole numbers on this chart)
-        d3.selectAll('g.yaxis .tick').each(function (d, i) {
-            if (d !== Math.round(d))
-                d3.select(this).remove()
-        });
+        // d3.selectAll('g.yaxis .tick').each(function (d, i) {
+        //     if (d !== Math.round(d))
+        //         d3.select(this).remove()
+        // });
 
         // Build correct output for dates
+        // @todo labels (month names + Wk)
         function getXLabel(d) {
             var yearStart, weekNo, clonedDate;
-            var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var monthNames = container.label.Chart_Label_Months.split(',');
             var thisDate = new Date(d.stats_at * 1000);
             if (container.period === 'week') {
                 // Calcuate week number from date;
@@ -182,7 +200,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
                 clonedDate.setUTCDate(clonedDate.getUTCDate() + 4 - (clonedDate.getUTCDay() || 7));
                 yearStart = new Date(Date.UTC(clonedDate.getUTCFullYear(), 0, 1));
                 weekNo = Math.ceil((((clonedDate - yearStart) / 86400000) + 1) / 7);
-                return 'Wk ' + weekNo;
+                return container.label.Chart_Label_Week + ' ' + weekNo;
             }
             if (container.period === 'day') // get day and month
                 return thisDate.getDate() + ' ' + monthNames[thisDate.getMonth()];

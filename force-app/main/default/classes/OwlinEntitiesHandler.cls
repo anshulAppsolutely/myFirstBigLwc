@@ -158,7 +158,7 @@ public with sharing class OwlinEntitiesHandler {
             
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
-                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/stats/day';
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/stats/hour';
                 System.debug(endpointString);
                 client.get(endpointString, token!=null ? token: owlinConfig.Token__c);
                 httpResponse = client.getHttpResponse();
