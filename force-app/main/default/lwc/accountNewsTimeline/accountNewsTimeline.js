@@ -1,7 +1,7 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import D3 from '@salesforce/resourceUrl/d3';
+import D3Asset from '@salesforce/resourceUrl/d3';
 import { NavigationMixin } from 'lightning/navigation';
 import getChartData from '@salesforce/apex/OwlinEntitiesManagementController.getAccountTimeline';
 
@@ -25,9 +25,6 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     textColor;
 
     @api
-    statKey;
-
-    @api
     period;
 
     @track
@@ -46,14 +43,16 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
 
     /** Get accounts from Apex */
     @wire(getChartData, { recordId: "$recordId" })
-    wiredBubbleResponse({ error, data }) {
-        if (data) {
-            console.log(data.values);
-            this.chartData = { children: JSON.parse(data.values) };
-            this.renderChart(this);
-        } else if (error) {
+    wiredResponse({ error, data }) {
+        if (error) {
             this.errorToast(error.body.message);
+            return;
         }
+        if (data === undefined) return;
+        if (data.values !== '') {
+            this.chartData = { children: JSON.parse(data.values).reverse() };
+        } else this.chartData = { children: [] };
+        this.renderChart(this);
     }
 
     /**
@@ -68,8 +67,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
 
         //load the scripts
         Promise.all([
-            loadScript(this, D3 + '/d3.V5.min.js'),
-            loadStyle(this, D3 + '/style.css'),
+            loadScript(this, D3Asset + '/d3.V5.min.js'),
+            loadStyle(this, D3Asset + '/style.css'),
         ]).then(() => {
             //initialize the graph if data created
             this.renderChart(this);
@@ -79,82 +78,82 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         });
     }
 
+    showChart() {
+        this.loading = false;
+        this.displayD3 = true;
+        d3.select(this.template.querySelector('div.d3'))
+        .attr("class", 'd3');
+    }
+
+    hideChart() {
+        this.loading = false;
+        this.displayD3 = false;
+        d3.select(this.template.querySelector('div.d3'))
+        .attr("class", 'd3 slds-hide');
+    }
+
 
 
     renderChart(c) {
 
-        var width, height, tooltip, bubble, svg, nodes, node, margin, parseDate;
+        var width, height, svg, margin, x, y, data;
 
         // bind container object for reference
         var container = c;
 
-        if (!this.chartData || !d3) return;
-
-        this.loading = false;
-        if (this.chartData.length < 1) {
-            this.displayD3 = false;
+        // Do not render prematurely.
+        if (!this.chartData || typeof(d3) === 'undefined' || !d3) return;
+        
+        // Only load if there is something to display.
+        if (this.chartData.children.length < 1) {
+            container.hideChart();
             return;
         }
-        this.displayD3 = true;
+        container.showChart();
 
+        // Set the dimensions and margins of the graph
         width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
         height = width * (100 / width); // Fixed aspect
+        margin = { top: 20, right: 20, bottom: 30, left: 40 };
+        width = width - margin.left - margin.right;
+        height = height - margin.top - margin.bottom;
 
-        // set the dimensions and margins of the graph
-        var margin = { top: 20, right: 20, bottom: 30, left: 40 },
-            width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
-
-        // set the ranges
-        var x = d3.scaleBand()
+        // Set the ranges
+        x = d3.scaleBand()
             .range([0, width])
             .padding(0.1);
-        var y = d3.scaleLinear()
-            .range([height, 0]);//.tickFormat(d3.format("d"));
-
-        // append the svg object to the body of the page
-        // append a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select(this.template.querySelector('div.d3')).append("svg")
+        y = d3.scaleLinear()
+            .range([height, 0]);
+        
+        // Build container svg
+        svg = d3.select(this.template.querySelector('div.d3 svg'))
+            .html("")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
-        var data = this.chartData.children;
-        // format the data
-        // data.forEach(function (d) {
-        //     d.sales = +d.sales;
-        // });
+        // reverse data so that most recent dates are on the right
+        data = this.chartData.children;
 
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
-
-
-        // Scale the range of the data in the domains
+        // Set the range of both axis
         x.domain(data.map(function (d) {
-            var thisDate = new Date(d.stats_at * 1000);
-            if (container.period === 'week')
-                return getWeekNumber(thisDate); //
-            if (container.period === 'day')
-                return thisDate.getDate() + monthNames[thisDate.getMonth()];
-            return d.stats_at;
+            return getXLabel(d);
         }));
         y.domain([0, d3.max(data, function (d) { return d.stats.all; })]);
 
-        // append the rectangles for the bar chart
+        // Add the bars
         svg.selectAll(".bar")
             .data(data)
             .enter().append("rect")
             .attr("class", "bar")
             .attr('fill', this.itemColor)
-            .attr("x", function (d) { return x(d.stats_at); })
+            .attr("x", function (d) { return x(getXLabel(d)); })
             .attr("width", x.bandwidth())
             .attr("y", function (d) { return y(d.stats.all); })
             .attr("height", function (d) { return height - y(d.stats.all); })
-            .on('click', function (d) { container.clickAction(d.stats_at) });
+            .on('click', function (d) { container.clickAction(d.stats_at) }); // Add onclick action binding
 
         // add the x Axis
         svg.append("g")
@@ -166,27 +165,33 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .attr("class", "yaxis")
             .call(d3.axisLeft(y).tickFormat(d3.format(".0s")));
 
+        // Remove some ticks (we only want whole numbers on this chart)
         d3.selectAll('g.yaxis .tick').each(function (d, i) {
             if (d !== Math.round(d))
                 d3.select(this).remove()
         });
 
-        function getWeekNumber(d) {
-            // Copy date so don't modify original
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            // Set to nearest Thursday: current date + 4 - current day number
-            // Make Sunday's day number 7
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            // Get first day of year
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            // Calculate full weeks to nearest Thursday
-            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            // Return array of year and week number
-            return [d.getUTCFullYear(), weekNo];
+        // Build correct output for dates
+        function getXLabel(d) {
+            var yearStart, weekNo, clonedDate;
+            var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var thisDate = new Date(d.stats_at * 1000);
+            if (container.period === 'week') {
+                // Calcuate week number from date;
+                clonedDate = new Date(Date.UTC(thisDate.getFullYear(), thisDate.getMonth(), thisDate.getDate()));
+                clonedDate.setUTCDate(clonedDate.getUTCDate() + 4 - (clonedDate.getUTCDay() || 7));
+                yearStart = new Date(Date.UTC(clonedDate.getUTCFullYear(), 0, 1));
+                weekNo = Math.ceil((((clonedDate - yearStart) / 86400000) + 1) / 7);
+                return 'Wk ' + weekNo;
+            }
+            if (container.period === 'day') // get day and month
+                return thisDate.getDate() + ' ' + monthNames[thisDate.getMonth()];
+            // Return month and year
+            return monthNames[thisDate.getMonth()] + ' ' + thisDate.getFullYear();
         }
-
     }
 
+    // @todo Fire event to navigate Account News to correct timestamp.
     clickAction(key) {
         //console.log(key)
     }

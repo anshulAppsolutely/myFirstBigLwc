@@ -12,8 +12,7 @@
           <property name="itemColor" type="String" default="#1f77b4"  label="Item Colour"/>
           <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
           <property name="title" type="String" default="Owlin News Timeline" label="Title" />
-          <property name="statKey" type="String" default="delta:month" label="Owlin Default Statistics Key" />
-          <property name="period" type="String" default="day" label="Owlin Default Period" />
+          <property name="period" type="String" default="day" label="Owlin Default Period" description="Enter day, week or month" />
       </targetConfig>
   </targetConfigs>
 </LightningComponentBundle>
