@@ -8,6 +8,11 @@ public class AccountTriggerHelper {
     public static integer counter=0; 
     
     public void OnBeforeInsert(List<Account> accounts) {
+         
+    }
+    
+    public void OnAfterInsert(Map<ID, Account> newAccountMap) {
+
         set<id> accountIdsToRequest = new set<id>();
         String exceptionMessage;
         Boolean sentToLink = false;
@@ -39,46 +44,52 @@ public class AccountTriggerHelper {
             }
             //total entities to request again on clicking link as batch id will get change>>
             Integer totalEntitiesToRequest = OwlinEntitiesHandler.getFeatureLicenseCount() - OwlinEntitiesHandler.getLinkedEnities();
-            //add accounts only which are allowed upto license
-            for(Account acc : accounts){
-                if(accountIdsToRequest.size() < totalEntitiesToRequest) accountIdsToRequest.add(acc.Id);
-                //avoid http callouts limit in a transaction assumption account will not be created so many, if so limit it to send to owlin to avoid governer limit
-                if(accountIdsToRequest.size() > 99 ) break;
+            //add accounts only to which are allowed upto license count and only those accounts which are just added
+            for(Account acc : newAccountMap.values()){
+                if(totalEntitiesToRequest > 0  && accountIdsToRequest.size() < totalEntitiesToRequest) accountIdsToRequest.add(acc.Id);
             }
-            linkAccountsToOwlin(accountIdsToRequest);
+            system.debug('accountIdsToRequest to link  >>'+accountIdsToRequest);
+            if(accountIdsToRequest.size() > 0) linkAccountsToOwlin(accountIdsToRequest);
+            sentToLink = true;
         }catch (Exception e){
             exceptionMessage = e.getMessage();
+            system.debug('exceptionMessage >> in trigger'+exceptionMessage);
 
         }
         finally {
             //publish event with message or success
         }
-         
+        
     }
 
+    /**
+    * call queueable and check size to avoid callout exception
+    * you cant add more than 50 queueable jobs in a transaction,
+    * assumption we will get less than 5000 accounts to track for owlin in one go!
+    *
+    * @param requestedAccountIds
+    */
     @future
     public static void linkAccountsToOwlin(Set<Id> requestedAccountIds){
-        List<AsyncApexJob> futureCalls = [
-                Select Id, CreatedById, CreatedBy.Name, ApexClassId,MethodName,Status
-                FROM AsyncApexJob
-                WHERE JobType = 'future' AND ApexClassId IN (SELECT Id
-                FROM ApexClass
-                WHERE Name = 'AccountTriggerHelper')];
-        Map<Id, Account> accountRequestedToLinkMap = new Map<Id, Account>();
 
-        for(Account accToRequest :[Select Id, Name, Website,Owlin_Entity_Id__c,Owlin_Entity_Requested_Id__c
-        From Account
-        where Id in : requestedAccountIds]){
-
-            accToRequest.Owlin_Entity_Requested_Id__c = futureCalls[0].Id;
-            accountRequestedToLinkMap.put(accToRequest.id, accToRequest);
+        if(requestedAccountIds!=null) {
+            List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+            Set<ID> accountIdsToQueue = new Set<ID>();
+            for(Id accountId : requestedAccountIds) {
+                accountIdsToQueue.add(accountId);
+                //check for max count. Queue if size is large
+                //avoid sending then to queue to avoid callout exception
+                if(accountIdsToQueue.size() > 100) {
+                    OwlinAccountsLinkQueue queueAccounts = new OwlinAccountsLinkQueue(owlinConfigList[0], accountIdsToQueue);
+                    System.enqueueJob(queueAccounts);
+                    accountIdsToQueue = new Set<ID>();
+                }
+            }
+            if(accountIdsToQueue.size() > 0) {
+                OwlinAccountsLinkQueue queueAccounts = new OwlinAccountsLinkQueue(owlinConfigList[0], accountIdsToQueue);
+                System.enqueueJob(queueAccounts);
+            }
         }
-        //make callouts
-
-    }
-    
-    public void OnAfterInsert(Map<ID, Account> newAccountMap) {
-        
     }
 
     public void OnBeforeUpdate(Map<ID, Account>  oldAccountMap, Map<ID, Account> newAccountMap) {
