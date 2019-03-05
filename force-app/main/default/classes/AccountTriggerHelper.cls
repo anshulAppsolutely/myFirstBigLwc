@@ -2,7 +2,7 @@
 Created by : Anshul Agrawal
 Created Date : 01/03/2019
 **/
-public class AccountTriggerHelper {
+public with sharing class AccountTriggerHelper {
     
     public static boolean skipTrigger = false;
     public static integer counter=0; 

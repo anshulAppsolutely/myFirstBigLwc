@@ -1,5 +1,5 @@
 @isTest
-private class AccountTriggerHelper_Test {
+private with sharing class  AccountTriggerHelper_Test {
 
     @isTest
     private static void testAccountToLinkWithToken() {
@@ -37,8 +37,8 @@ private class AccountTriggerHelper_Test {
             System.assertEquals( 1, OwlinEntitiesHandler.eventList.size());
         }
     }
-
-    @isTest
+    
+        @isTest
     private static void testAccountToLinkWithoutToken() {
 
         //create custom setting test data
@@ -70,17 +70,17 @@ private class AccountTriggerHelper_Test {
             insert accountList;
             Test.stopTest();
             Map<String, Configuration_Settings__c> setting = Configuration_Settings__c.getall();
-            Configuration_Settings__c config = setting.get('Test_Owlin');
+        	Configuration_Settings__c config = setting.get('Test_Owlin');
             System.assertEquals('testToken' , config.Token__c);
-            System.assertEquals(config.Token_Expiry_Date__c > System.Today(), true);
+        	System.assertEquals(config.Token_Expiry_Date__c > System.Today(), true);
             AsyncApexJob job = [SELECT Id, Status, MethodName, ApexClass.Name FROM AsyncApexJob];
             System.assertEquals('OwlinAccountsLinkQueue', job.ApexClass.Name);
             System.assertEquals( 1, OwlinEntitiesHandler.eventList.size());
-
+            
             //update
             acc2.Website = 'test23.com';
             update acc2;
-
+            
             delete acc2;
         }
     }

@@ -49,6 +49,7 @@ public with sharing class OwlinAccountsLinkQueue implements System.Queueable, Da
                         httpResponse = client.getHttpResponse();
                         if (httpResponse != null) {
                             String jsonResponse = httpResponse.getBody();
+                            System.debug('jsonResponse in queue'+jsonResponse);
                             OwlinLinkEntitiesResponseWrapper apiResponse = OwlinLinkEntitiesResponseWrapper.parse(jsonResponse);
                             for (OwlinLinkEntitiesResponseWrapper.matches owlinEntity : apiResponse.matches) {
                                 Id accountId = Id.valueOf(owlinEntity.original_id);

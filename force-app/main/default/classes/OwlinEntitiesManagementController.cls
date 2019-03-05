@@ -264,44 +264,7 @@ public with sharing class OwlinEntitiesManagementController {
                 system.debug('timelineResponse in top news >>'+timelineResponse);
 
                 List<Object> objm = (List<Object>) JSON.deserializeUntyped(timelineResponse);
-                Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
-
-                for (Object responseObject : objm) {
-                    String entityKey;
-                    List<String> articles = new List<String>();
-                    Map<String, Object> responseMap = OwlinEntitiesHandler.getJsonDesialzedMap(responseObject);
-                    if (responseMap != null) {
-                        for (String keyVal : responseMap.keySet()) {
-                            if (keyVal == 'key') {
-                                entityKey = (String) responseMap.get(keyVal);
-                            }
-                            if (keyVal == 'stats') {
-                                Object statsObject = responseMap.get(keyVal);
-                                Map<String, Object> statsMap = OwlinEntitiesHandler.getJsonDesialzedMap(statsObject);
-                                if (statsMap != null) {
-                                    for (String statsKey : statsMap.keySet()) {
-                                        if (statsKey.equalsIgnoreCase(filter)) {
-                                            Object filterNewsObj = statsMap.get(statsKey);
-                                            Map<String, Object> filterNewsMap = OwlinEntitiesHandler.getJsonDesialzedMap(filterNewsObj);
-                                            //system.debug('filterNewsMap >>>'+filterNewsMap);
-                                            for(String filterNews : filterNewsMap.keySet()){
-                                                //system.debug('filterNews >'+filterNewsMap.get(filterNews));
-                                                List<Object> resultslist = (List<Object>)filterNewsMap.get(filterNews);
-                                                for(Object mapa:resultslist ){
-                                                    Map<String,Object> tempMap = (Map<String,Object>)mapa;
-                                                    String articleId = (String)tempMap.get('urlhash');
-                                                    //system.debug('articleId '+tempMap.get('urlhash'));
-                                                    articles.add(articleId);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (!topNewRequest.containsKey(entityKey)) topNewRequest.put(entityKey,articles);
-                    }
-                }
+                Map<String, List<String>> topNewRequest = getTopNewRequest(objm, filter);
                 system.debug('topNewRequest >>>'+topNewRequest);
                 if(topNewRequest!= null && topNewRequest.size() > 0) {
                     Map<String, Object> requestToSerialize = new Map<String, Object>{'timelines' => topNewRequest};
@@ -338,5 +301,55 @@ public with sharing class OwlinEntitiesManagementController {
             }
         }
         return response;
+    }
+
+    /**
+     * the method is used to parse json and get top news
+     *
+     * @param objm
+     * @param filter
+     *
+     * @return
+     */
+    private static Map<String, List<String>> getTopNewRequest(List<Object> objm, String filter) {
+        Map<String, List<String>> topNewRequest = new Map<String, List<String>>();
+
+        for (Object responseObject : objm) {
+            String entityKey;
+            List<String> articles = new List<String>();
+            Map<String, Object> responseMap = OwlinEntitiesHandler.getJsonDesialzedMap(responseObject);
+            if (responseMap != null) {
+                for (String keyVal : responseMap.keySet()) {
+                    if (keyVal == 'key') {
+                        entityKey = (String) responseMap.get(keyVal);
+                    }
+                    if (keyVal == 'stats') {
+                        Object statsObject = responseMap.get(keyVal);
+                        Map<String, Object> statsMap = OwlinEntitiesHandler.getJsonDesialzedMap(statsObject);
+                        if (statsMap != null) {
+                            for (String statsKey : statsMap.keySet()) {
+                                if (statsKey.equalsIgnoreCase(filter)) {
+                                    Object filterNewsObj = statsMap.get(statsKey);
+                                    Map<String, Object> filterNewsMap = OwlinEntitiesHandler.getJsonDesialzedMap(filterNewsObj);
+                                    //system.debug('filterNewsMap >>>'+filterNewsMap);
+                                    for (String filterNews : filterNewsMap.keySet()) {
+                                        //system.debug('filterNews >'+filterNewsMap.get(filterNews));
+                                        List<Object> resultslist = (List<Object>) filterNewsMap.get(filterNews);
+                                        for (Object mapa : resultslist) {
+                                            Map<String, Object> tempMap = (Map<String, Object>) mapa;
+                                            String articleId = (String) tempMap.get('urlhash');
+                                            //system.debug('articleId '+tempMap.get('urlhash'));
+                                            articles.add(articleId);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!topNewRequest.containsKey(entityKey)) topNewRequest.put(entityKey, articles);
+            }
+        }
+        return topNewRequest;
     }
 }
