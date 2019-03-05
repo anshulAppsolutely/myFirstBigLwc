@@ -6,10 +6,12 @@ public with sharing class OwlinAccountsLinkQueue implements System.Queueable, Da
 
     private Set<Id> queuedAccountIds;
     private Configuration_Settings__c owlinConfiguration;
+    String token;
 
-    public OwlinAccountsLinkQueue(Configuration_Settings__c owlinConfiguration, Set<Id> queuedAccountIds) {
+    public OwlinAccountsLinkQueue(Configuration_Settings__c owlinConfiguration, Set<Id> queuedAccountIds, String token) {
         this.queuedAccountIds = queuedAccountIds;
         this.owlinConfiguration = owlinConfiguration;
+        this.token = token;
     }
 
     /**
@@ -43,7 +45,7 @@ public with sharing class OwlinAccountsLinkQueue implements System.Queueable, Da
                         system.debug('body in OwlinAccountsLinkQueue >>' + body);
                         HttpClient client = new HttpClient();
                         String endpointString = 'https://' + owlinConfiguration.Endpoint__c + 'filters/suggest';
-                        client.post(endpointString, body, owlinConfiguration.Token__c);
+                        client.post(endpointString, body, token!=null ? token: owlinConfiguration.Token__c);
                         httpResponse = client.getHttpResponse();
                         if (httpResponse != null) {
                             String jsonResponse = httpResponse.getBody();

@@ -103,6 +103,32 @@ private class OwlinEntitiesHandler_Test {
     }
 
     @isTest
+    static void testSaveToken(){
+        //create custom setting test data
+        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+
+        Configuration_Settings__c configProd = new Configuration_Settings__c();
+        configProd.Name = 'Test_Owlin';
+        configProd.Email__c = 'test@test.com';
+        configProd.Endpoint__c = 'api.test.owlin/v1/';
+        configProd.Password__c = 'testPassword';
+        configProd.Token__c = 'testToken';
+        configProd.Token_Expiry_Date__c = System.Today().addDays(-2);
+        configProd.Is_Primary__c = True;
+        toInsertCustomSettingRecList.add(configProd);
+
+        insert toInsertCustomSettingRecList;
+        Test.startTest();
+        OwlinEntitiesHandler.saveAPIToken('testTokenNewVal');
+        Test.stopTest();
+        //get the custom settings again
+        Map<String, Configuration_Settings__c> setting = Configuration_Settings__c.getall();
+        Configuration_Settings__c config = setting.get('Test_Owlin');
+        String token = config.Token__c;
+        System.assertEquals('testTokenNewVal', token);
+    }
+
+    @isTest
     static void testEntityTimeline(){
         //create custom setting test data
         list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();

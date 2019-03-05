@@ -5,6 +5,7 @@
  */
 
 public with sharing class OwlinEntitiesHandler {
+    @testVisible private static List<Owlin_Notification__e> eventList = new List<Owlin_Notification__e>();
 
     /**
      * get all accounts in the org which are linked to owlin
@@ -81,6 +82,7 @@ public with sharing class OwlinEntitiesHandler {
                 String body = Json.serialize(apiRequestWrapper);
                 HttpClient client = new HttpClient();
                 String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'tokens';
+                if(Test.isRunningTest()) endpointString = 'getToken';
                 client.post(endpointString, body, null);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
@@ -263,6 +265,16 @@ public with sharing class OwlinEntitiesHandler {
                 Id, Name, Owlin_Entity_Id__c
         FROM Account
         WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC limit 100];
+    }
+
+    /**
+     * method used to publish notifications
+     *
+     * @param event
+     */
+    public static void publishNotification(Owlin_Notification__e event){
+        eventList.add(event);
+        EventBus.publish(event);
     }
 
 }
