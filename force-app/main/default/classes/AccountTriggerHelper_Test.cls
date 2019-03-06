@@ -38,7 +38,7 @@ private with sharing class  AccountTriggerHelper_Test {
         }
     }
     
-        @isTest
+    @isTest
     private static void testAccountToLinkWithoutToken() {
 
         //create custom setting test data
@@ -76,12 +76,7 @@ private with sharing class  AccountTriggerHelper_Test {
             AsyncApexJob job = [SELECT Id, Status, MethodName, ApexClass.Name FROM AsyncApexJob];
             System.assertEquals('OwlinAccountsLinkQueue', job.ApexClass.Name);
             System.assertEquals( 1, OwlinEntitiesHandler.eventList.size());
-            
-            //update
-            acc2.Website = 'test23.com';
-            update acc2;
-            
-            delete acc2;
+
         }
     }
 

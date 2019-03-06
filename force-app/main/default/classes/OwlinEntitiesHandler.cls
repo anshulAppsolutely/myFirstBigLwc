@@ -5,7 +5,7 @@
  */
 
 public with sharing class OwlinEntitiesHandler {
-    @testVisible private static List<Owlin_Notification__e> eventList = new List<Owlin_Notification__e>();
+    @testVisible private static List<Owlin_Notification__e> eventList;
 
     /**
      * get all accounts in the org which are linked to owlin
@@ -273,6 +273,7 @@ public with sharing class OwlinEntitiesHandler {
      * @param event
      */
     public static void publishNotification(Owlin_Notification__e event){
+        eventList = new List<Owlin_Notification__e>();
         eventList.add(event);
         EventBus.publish(event);
     }

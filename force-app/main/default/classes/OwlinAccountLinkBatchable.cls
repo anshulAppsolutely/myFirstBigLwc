@@ -58,8 +58,8 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
                             && owlinConfiguration.size() > 0
                             && owlinConfiguration[0] != null
                             && (owlinConfiguration[0].Token__c == null || owlinConfiguration[0].Token_Expiry_Date__c < today)) {
-                        system.debug('requesting API token from batchable');
                         token = OwlinEntitiesHandler.requestAPIToken(owlinConfiguration[0]);
+                        system.debug('requesting API token from batchable '+token);
                         isTokenNew = true;
                     }
                     HttpResponse httpResponse;

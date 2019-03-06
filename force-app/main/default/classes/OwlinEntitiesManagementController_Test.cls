@@ -4,6 +4,7 @@ private class OwlinEntitiesManagementController_Test {
     @testSetup
     static void setUp() {
 
+        AccountTriggerHelper.skipTrigger = true;
         list<Account> accountList = new list<Account>();
         Account acc1 = new Account();
         acc1.Name = 'Test';

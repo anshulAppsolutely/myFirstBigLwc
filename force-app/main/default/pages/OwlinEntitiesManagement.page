@@ -1,4 +1,14 @@
 <apex:page controller="OwlinEntitiesManagementController" lightningStylesheets="true" sidebar="false" showHeader="false" >
+    <style type="text/css">
+        table.exceptionText td {
+
+            font-style:italic;
+            font-size:16px;
+            font-weight:bold;
+            text-align:center;
+            color:red;}
+    </style>
+
     <apex:slds />
     <div class="slds-p-around_medium">
         <apex:form >
@@ -24,7 +34,7 @@
                 </div>
             </article>
             <div>
-                <apex:pageMessages />
+                <apex:pageMessages layout="table" styleClass="exceptionText" />
                 <table class="slds-table slds-table--bordered slds-table_cell-buffer">
                     <thead>
                     <tr class="slds-text-title">

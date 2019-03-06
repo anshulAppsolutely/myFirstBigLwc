@@ -27,7 +27,7 @@ public class MockHttpResponseGenerator implements HttpCalloutMock {
                         '"original_id": "0019E00000uB55lQAC" }, { "score": 14, "title": "HEMbrug", "filter_id": "9b682ae6-4b10-43c8-a408-ac2323a481b2", ' +
                         '"original_id": "0019E00000tvpjNQAQ" } ], "base_filter_library_size": 2929 }';
             }
-            if(responseType!= null && (responseType == 'apiToken') || request.getEndpoint().equalsIgnoreCase('getToken')) {
+            if(responseType!= null && (responseType == 'apiToken' || request.getEndpoint().equalsIgnoreCase('getToken'))) {
                 responseJson = '{"token": "testToken"}';
             }
             if(responseType!= null && responseType == 'getTimelines') {

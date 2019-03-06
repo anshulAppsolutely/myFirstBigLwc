@@ -4,6 +4,7 @@ private class OwlinAccountLinkBatchable_Test {
     @testSetup
     static void setUp() {
 
+        AccountTriggerHelper.skipTrigger = true;
         list<Account> accountList = new list<Account>();
         Account acc1 = new Account();
         acc1.Name = 'Test';
@@ -66,8 +67,9 @@ private class OwlinAccountLinkBatchable_Test {
         OwlinAccountLinkBatchable linkOwlinBatch = new OwlinAccountLinkBatchable('',2,null);
         database.executeBatch(linkOwlinBatch, 200);
         Test.stopTest();
-        list<Account> account = [Select id, Owlin_Entity_Requested_Id__c from Account limit 5];
-        System.assert(account[0].Owlin_Entity_Requested_Id__c!=null);
+        for(Account acc : [Select id,Name,Owlin_Entity_Requested_Id__c FROM Account]){  
+            System.assert(acc.Owlin_Entity_Requested_Id__c!=null);
+        }
         //get the custom settings again
         Map<String, Configuration_Settings__c> setting = Configuration_Settings__c.getall();
         Configuration_Settings__c config = setting.get('Test_Owlin1');
