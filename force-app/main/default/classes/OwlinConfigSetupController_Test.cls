@@ -19,7 +19,7 @@ private class OwlinConfigSetupController_Test {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Expected error message, no primary');
         con.editingRow.Is_Primary__c = true;
         con.saveConfig();
-        System.assertEquals(2, ApexPages.getMessages().size(), 'Expected error message, Required fields not filled');
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Expected error message, Required fields not filled');
         con.editingRow.Is_Primary__c = true;
         con.editingRow.Endpoint__c = 'test endpoint';
         con.editingRow.Email__c = 'test@test.com';
@@ -64,7 +64,7 @@ private class OwlinConfigSetupController_Test {
         // Delete should give error since it's deleting the primary
         con.deleteConfig();
         //system.debug('error message 2'+ApexPages.getMessages());
-        System.assertEquals(3, ApexPages.getMessages().size(), 'Expected error message, deleting primary');
+        System.assertEquals(2, ApexPages.getMessages().size(), 'Expected error message, deleting primary');
         con.cancelConfig();
         System.assertEquals(null, con.editingRow, 'Expected no row in edit mode anymore after cancel');
         //

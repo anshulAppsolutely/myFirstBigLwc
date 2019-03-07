@@ -11,8 +11,6 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
     Integer limitFilter;
 
     public OwlinAccountLinkBatchable(String query, Integer limitEntitiesFilter, String tokenString){
-        //get the primary configuration
-        this.owlinConfiguration = OwlinEntitiesHandler.getRequestedConfiguration(null);
         this.token = tokenString;
         //system.debug('tokenString received >>'+tokenString);
         this.queryString=query;
@@ -39,6 +37,10 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
 
         system.debug('accList size >>'+accList.size()+ 'token >>'+token);
         if(accList.size() > 0) {
+            Boolean isTokenNew = false;
+            Date today = System.Today();
+            //get the primary configuration
+            owlinConfiguration = OwlinEntitiesHandler.getRequestedConfiguration(null);
             for(Account accountRequested : accList){
                 accountRequested.Owlin_Entity_Requested_Id__c = BC.getJobId();
             }
@@ -48,6 +50,18 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
                 //not checking API expiry. If batch fails request a new token from UI
                 if (owlinConfiguration != null && owlinConfiguration.size() > 0
                         && owlinConfiguration[0] != null) {
+
+                    //check if token is not valid get the new token first (taken care scenario from a schedulable class)
+                    //generate new token again
+                    if (token == null &&
+                            owlinConfiguration != null
+                            && owlinConfiguration.size() > 0
+                            && owlinConfiguration[0] != null
+                            && (owlinConfiguration[0].Token__c == null || owlinConfiguration[0].Token_Expiry_Date__c < today)) {
+                        token = OwlinEntitiesHandler.requestAPIToken(owlinConfiguration[0]);
+                        system.debug('requesting API token from batchable '+token);
+                        isTokenNew = true;
+                    }
                     HttpResponse httpResponse;
                     //collection of accounts scope is defined as 200
                     //create wrapper for 200 accounts to send
@@ -74,6 +88,15 @@ public class OwlinAccountLinkBatchable implements Database.Batchable<SObject>, D
                         update accountRequestedToLinkMap.values();
                     }
 
+                    if(isTokenNew) {
+                        system.debug('owlinConfig saving token in batchable>>'+owlinConfiguration[0]);
+                        owlinConfiguration[0].Token__c = token;
+                        owlinConfiguration[0].Token_Expiry_Date__c = today.addDays(25);
+                        update owlinConfiguration[0];
+                    }
+
+                }else{
+                    System.debug('no backend owlin config');
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while linking accounts to Owlin in OwlinAccountLinkBatchable ' + e.getMessage());

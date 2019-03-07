@@ -4,6 +4,7 @@ private class OwlinEntitiesHandler_Test {
     @testSetup
     static void setUp() {
 
+    AccountTriggerHelper.skipTrigger = true;
     list<Account> accountList = new list<Account>();
     Account acc1 = new Account();
     acc1.Name = 'Test';
@@ -103,6 +104,32 @@ private class OwlinEntitiesHandler_Test {
     }
 
     @isTest
+    static void testSaveToken(){
+        //create custom setting test data
+        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+
+        Configuration_Settings__c configProd = new Configuration_Settings__c();
+        configProd.Name = 'Test_Owlin';
+        configProd.Email__c = 'test@test.com';
+        configProd.Endpoint__c = 'api.test.owlin/v1/';
+        configProd.Password__c = 'testPassword';
+        configProd.Token__c = 'testToken';
+        configProd.Token_Expiry_Date__c = System.Today().addDays(-2);
+        configProd.Is_Primary__c = True;
+        toInsertCustomSettingRecList.add(configProd);
+
+        insert toInsertCustomSettingRecList;
+        Test.startTest();
+        OwlinEntitiesHandler.saveAPIToken('testTokenNewVal');
+        Test.stopTest();
+        //get the custom settings again
+        Map<String, Configuration_Settings__c> setting = Configuration_Settings__c.getall();
+        Configuration_Settings__c config = setting.get('Test_Owlin');
+        String token = config.Token__c;
+        System.assertEquals('testTokenNewVal', token);
+    }
+
+    @isTest
     static void testEntityTimeline(){
         //create custom setting test data
         list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
@@ -121,6 +148,30 @@ private class OwlinEntitiesHandler_Test {
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getTimelines'));
         String timelineJson = OwlinEntitiesHandler.getEntityTimeline(toInsertCustomSettingRecList[0],'testToken');
+        System.assert(timelineJson!=null);
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testTopNews(){
+        //create custom setting test data
+        list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+
+        Configuration_Settings__c configProd = new Configuration_Settings__c();
+        configProd.Name = 'Test_Owlin';
+        configProd.Email__c = 'test@test.com';
+        configProd.Endpoint__c = 'api.test.owlin/v1/';
+        configProd.Password__c = 'testPassword';
+        configProd.Token__c = 'testToken';
+        configProd.Token_Expiry_Date__c = System.Today().addDays(-2);
+        configProd.Is_Primary__c = True;
+        toInsertCustomSettingRecList.add(configProd);
+
+        insert toInsertCustomSettingRecList;
+        Test.startTest();
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getTimelines'));
+        String requestedString ='{"timelines":{"ca13713c-fcd4-44a7-82ca-fcda6fd96011":["dd45e16ed6a20bc71107b53cc4c43c71","696e4c02dc58de957864f653e64c1a04"]}}';
+        String timelineJson = OwlinEntitiesHandler.getTopNewsData(requestedString,toInsertCustomSettingRecList[0],'testToken');
         System.assert(timelineJson!=null);
         Test.stopTest();
     }

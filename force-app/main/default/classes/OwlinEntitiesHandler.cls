@@ -5,6 +5,7 @@
  */
 
 public with sharing class OwlinEntitiesHandler {
+    @testVisible private static List<Owlin_Notification__e> eventList;
 
     /**
      * get all accounts in the org which are linked to owlin
@@ -60,8 +61,8 @@ public with sharing class OwlinEntitiesHandler {
         system.debug('linking entities to owlin >>>');
         //call apex batch class to process records
         OwlinAccountLinkBatchable linkEntities = new OwlinAccountLinkBatchable('',limitEntitiesFilter, tokenString);
-        //set to maximum scope size
-        Database.executeBatch(linkEntities, 200);
+        //defining scope to avoid all out limit, batch is executed in chunks based on scope size.
+        Database.executeBatch(linkEntities, 75);
 
     }
 
@@ -81,6 +82,7 @@ public with sharing class OwlinEntitiesHandler {
                 String body = Json.serialize(apiRequestWrapper);
                 HttpClient client = new HttpClient();
                 String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'tokens';
+                if(Test.isRunningTest()) endpointString = 'getToken';
                 client.post(endpointString, body, null);
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
@@ -112,7 +114,7 @@ public with sharing class OwlinEntitiesHandler {
                 for(Account account : [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Owlin_Entity_Id__c!=null
-                ORDER BY CreatedDate DESC LIMIT 100]){
+                ORDER BY LastModifiedDate DESC LIMIT 100]){
                     keys.add(account.Owlin_Entity_Id__c);
                 }
                 Map<String, Set<String>> jsonMap = new Map<String, Set<String>>();
@@ -127,7 +129,7 @@ public with sharing class OwlinEntitiesHandler {
                 httpResponse = client.getHttpResponse();
                 if(httpResponse!=null) {
                     timeLineResponse = httpResponse.getBody();
-                    system.debug('timeLineResponse >>'+timeLineResponse);
+                    //system.debug('timeLineResponse >>'+timeLineResponse);
                 }
             } catch (Exception e) {
                 System.debug(LoggingLevel.DEBUG, '***** Error:while getting entity timeline ' + e.getMessage());
@@ -162,7 +164,7 @@ public with sharing class OwlinEntitiesHandler {
         for(Account entity : requestedAccountList){
             OwlinLinkEntitiesRequestWrapper.entities entityToLink = new OwlinLinkEntitiesRequestWrapper.entities();
             entityToLink.id = entity.Id;
-            if(!String.ISBLANK(entity.Website)) entityToLink.domain = entity.Website;
+            entityToLink.domain = String.ISBLANK(entity.Website) ? 'null': entity.Website;
             entityToLink.name = entity.Name;
             entityList.add(entityToLink);
         }
@@ -212,6 +214,68 @@ public with sharing class OwlinEntitiesHandler {
                     WHERE Is_Primary__c = true];
         }
         return owlinConfigList;
+    }
+
+    /**
+     * deserialize json and return key value
+     *
+     * @param obj
+     *
+     * @return
+     */
+    public static Map<String, Object> getJsonDesialzedMap(Object obj) {
+        String jsonString = JSON.serialize(obj);
+        return (Map<String, Object>) JSON.deserializeUntyped(jsonString);
+    }
+
+    /**
+     * get the top news data
+     *
+     * @return boolean
+     */
+    public static String getTopNewsData(String requestedString, final Configuration_Settings__c owlinConfig, String token){
+        String topNewResponse = null;
+        if(owlinConfig!=null && requestedString!=null) {
+            try {
+                system.debug('input json >>>'+requestedString);
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/events';
+                if(Test.isRunningTest()) endpointString = 'topNewsTestEndPoint';
+                client.post(endpointString,requestedString, token!=null ? token: owlinConfig.Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    topNewResponse = httpResponse.getBody();
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while getting top news ' + e.getMessage());
+                throw e;
+            }
+        }
+        return topNewResponse;
+    }
+
+    /**
+     * get the list of accessible accounts
+     *
+     * @return boolean
+     */
+    public static List<Account> getAccessibleAccounts(){
+        return [SELECT
+                Id, Name, Owlin_Entity_Id__c
+        FROM Account
+        WHERE Owlin_Entity_Id__c!=null ORDER BY LastModifiedDate DESC limit 100];
+    }
+
+    /**
+     * method used to publish notifications
+     *
+     * @param event
+     */
+    public static void publishNotification(Owlin_Notification__e event){
+        eventList = new List<Owlin_Notification__e>();
+        eventList.add(event);
+        EventBus.publish(event);
     }
 
 }
