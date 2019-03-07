@@ -13,6 +13,7 @@
           <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
           <property name="title" type="String" default="Owlin News Timeline" label="Title" />
           <property name="chartFilter" type="String" default="day" label="Owlin Default Period" description="Enter day, week or month" />
+          <property name="chartLimit" type="String" default="25" label="Bar Count" description="Maximum number of bars" />
       </targetConfig>
   </targetConfigs>
 </LightningComponentBundle>

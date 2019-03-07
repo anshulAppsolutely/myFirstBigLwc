@@ -17,6 +17,9 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     textColor;
 
     @api
+    chartLimit;
+
+    @api
     chartFilter;
 
     @track
@@ -87,23 +90,14 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         });
 
         // Build correct output for dates
-        // @todo labels (month names + Wk)
         function getXLabel(d) {
-            var yearStart, weekNo, clonedDate;
-            var monthNames = container.label.Chart_Label_Months.split(',');
-            var thisDate = new Date(d.stats_at * 1000);
             if (container.chartFilter === 'week') {
-                // Calcuate week number from date;
-                clonedDate = new Date(Date.UTC(thisDate.getFullYear(), thisDate.getMonth(), thisDate.getDate()));
-                clonedDate.setUTCDate(clonedDate.getUTCDate() + 4 - (clonedDate.getUTCDay() || 7));
-                yearStart = new Date(Date.UTC(clonedDate.getUTCFullYear(), 0, 1));
-                weekNo = Math.ceil((((clonedDate - yearStart) / 86400000) + 1) / 7);
-                return container.label.Chart_Label_Week + ' ' + weekNo;
+                return container.label.Chart_Label_Week + ' ' + moment(d.stats_at * 1000 ).startOf(container.chartFilter).week();
             }
             if (container.chartFilter === 'day') // get day and month
-                return thisDate.getDate() + ' ' + monthNames[thisDate.getMonth()];
+                return moment(d.stats_at * 1000).startOf(container.chartFilter).format('D MMM');
             // Return month and year
-            return monthNames[thisDate.getMonth()] + ' ' + thisDate.getFullYear();
+            return moment(d.stats_at * 1000).startOf(container.chartFilter).format('MMM YY');
         }
 
         function formatData(stats_per_hour) {
@@ -113,7 +107,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
                 stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
                 stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
              });
-            return Object.values(stats_per_day);
+            return Object.values(stats_per_day).slice(0,container.chartLimit);
         }
 
         // @todo Fire event to navigate Account News to correct timestamp.

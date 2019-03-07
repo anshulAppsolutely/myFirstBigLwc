@@ -35,6 +35,9 @@ export default class D3Chart extends NavigationMixin(LightningElement) {
     @api
     chartData;
 
+    @api
+    chartLimit;
+
     @track
     loading = true;
 
