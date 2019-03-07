@@ -4,6 +4,7 @@ private class OwlinEntitiesManagementController_Test {
     @testSetup
     static void setUp() {
 
+        AccountTriggerHelper.skipTrigger = true;
         list<Account> accountList = new list<Account>();
         Account acc1 = new Account();
         acc1.Name = 'Test';
@@ -232,4 +233,35 @@ private class OwlinEntitiesManagementController_Test {
             Test.stopTest();
         }
     }
+
+    @isTest
+    static void testTopNewsData() {
+        //create custom setting test data
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
+            list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+            Configuration_Settings__c configProd = new Configuration_Settings__c();
+            configProd.Name = 'Test_Owlin';
+            configProd.Email__c = 'test@test.com';
+            configProd.Endpoint__c = 'api.test.owlin/v1/';
+            configProd.Password__c = 'testPassword';
+            configProd.Is_Primary__c = true;
+            configProd.Token__c = 'testToken';
+            configProd.Token_Expiry_Date__c = System.Today().addDays(2);
+            toInsertCustomSettingRecList.add(configProd);
+            insert toInsertCustomSettingRecList;
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getTimelines'));
+            try {
+                Map<String, Object> topNewsResponse = OwlinEntitiesManagementController.getTopNewsData('topnews:week');
+                System.assert(topNewsResponse!=null);
+                List<String> topNews = (List<String>)topNewsResponse.get('values');
+                System.assertEquals(1,topNews.size());
+            } catch (Exception e) {
+
+            }
+            Test.stopTest();
+        }
+    }
+
+
 }

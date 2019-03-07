@@ -1,0 +1,30 @@
+.lgc-bg {
+    background-color: rgb(255, 255, 255);
+}
+
+.lgc-bg-inverse {
+    background-color: rgb(22, 50, 92);
+}
+
+.owlin-dashboard-ui-topnews-item-article-keywords {
+    height: 26px;
+    overflow: hidden;
+}
+
+.owlin-dashboard-ui-topnews-item-article-keywords > div {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 0 5px;
+    line-height: 20px;
+    margin-top: 4px;
+    margin-right: 5px;
+    color: white;
+}
+
+.owlin-image{
+    width: 15%;
+    float: right;
+    margin-top: -45px;
+}
+

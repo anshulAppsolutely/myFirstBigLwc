@@ -68,7 +68,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error_NoEntitiesToLink</shortDescription>
-        <value>There are no accounts to link</value>
+        <value>there are no accounts to link</value>
     </labels>
     <labels>
         <fullName>Error_NoOwlinConfig</fullName>
@@ -82,14 +82,14 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error PrimaryConfig</shortDescription>
-        <value>There must be one primary configuration</value>
+        <value>there must be one primary configuration</value>
     </labels>
     <labels>
         <fullName>Error_PrimaryConfigDelete</fullName>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error PrimaryConfigDelete</shortDescription>
-        <value>Configuration cannot be deleted. There must be one primary configuration</value>
+        <value>configuration cannot be deleted. There must be one primary configuration</value>
     </labels>
     <labels>
         <fullName>Error_Title</fullName>

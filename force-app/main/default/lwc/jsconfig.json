@@ -11,6 +11,18 @@
             ],
             "c/d3": [
                 "../staticresources/d3/d3.js"
+            ],
+            "c/account-title": [
+                "accountTitle/accountTitle.js"
+            ],
+            "c/relative-date-time": [
+                "relativeDateTime/relativeDateTime.js"
+            ],
+            "c/top-news": [
+                "topNews/topNews.js"
+            ],
+            "c/utils": [
+                "utils/utils.js"
             ]
         }
     },
