@@ -17,7 +17,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     textColor;
 
     @api
-    period;
+    chartFilter;
 
     @track
     chartData;
@@ -25,9 +25,13 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     /**
      * Define the logic to build the chart from the available data
      */
-    @track chartMethod = function(width, height, svg, margin, x, y, container) {
+    @track chartMethod = function(width, height, svg, container) {
             
-        var data;
+        var data, x, y, margin;
+
+        margin = { top: 20, right: 20, bottom: 30, left: 40 };
+        width = width - margin.left - margin.right;
+        height = height - margin.top - margin.bottom;
 
         // Set the ranges
         x = d3.scaleBand()
@@ -88,7 +92,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             var yearStart, weekNo, clonedDate;
             var monthNames = container.label.Chart_Label_Months.split(',');
             var thisDate = new Date(d.stats_at * 1000);
-            if (container.period === 'week') {
+            if (container.chartFilter === 'week') {
                 // Calcuate week number from date;
                 clonedDate = new Date(Date.UTC(thisDate.getFullYear(), thisDate.getMonth(), thisDate.getDate()));
                 clonedDate.setUTCDate(clonedDate.getUTCDate() + 4 - (clonedDate.getUTCDay() || 7));
@@ -96,7 +100,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
                 weekNo = Math.ceil((((clonedDate - yearStart) / 86400000) + 1) / 7);
                 return container.label.Chart_Label_Week + ' ' + weekNo;
             }
-            if (container.period === 'day') // get day and month
+            if (container.chartFilter === 'day') // get day and month
                 return thisDate.getDate() + ' ' + monthNames[thisDate.getMonth()];
             // Return month and year
             return monthNames[thisDate.getMonth()] + ' ' + thisDate.getFullYear();
@@ -105,7 +109,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         function formatData(stats_per_hour) {
             // Data is retrieved in hourly grouping and re-grouped on defined period using momentjs:
             let stats_per_day = {}; stats_per_hour.forEach( stat => {
-                let k = moment( stat.stats_at * 1000 ).startOf(container.period).unix();
+                let k = moment( stat.stats_at * 1000 ).startOf(container.chartFilter).unix();
                 stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
                 stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
              });

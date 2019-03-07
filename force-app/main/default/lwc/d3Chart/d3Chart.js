@@ -27,7 +27,7 @@ export default class D3Chart extends NavigationMixin(LightningElement) {
     textColor;
 
     @api
-    period;
+    chartFilter;
 
     @track
     displayD3 = true;
@@ -90,7 +90,7 @@ export default class D3Chart extends NavigationMixin(LightningElement) {
 
     renderChart(c) {
 
-        var width, height, svg, margin, x, y;
+        var width, height, svg;
 
         // bind container object for reference
         var container = c;
@@ -108,10 +108,7 @@ export default class D3Chart extends NavigationMixin(LightningElement) {
         // Set the dimensions and margins of the graph
         width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
         height = width * (100 / width); // Fixed aspect
-        margin = { top: 20, right: 20, bottom: 30, left: 40 };
-        width = width - margin.left - margin.right;
-        height = height - margin.top - margin.bottom;
 
-        this.chartMethod(width, height, svg, margin, x, y, container);
+        this.chartMethod(width, height, svg, container);
     }
 }

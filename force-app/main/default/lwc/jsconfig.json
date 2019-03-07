@@ -26,6 +26,9 @@
             ],
             "c/d3-chart": [
                 "d3Chart/d3Chart.js"
+            ],
+            "c/owlin-logo": [
+                "owlinLogo/owlinLogo.js"
             ]
         }
     },
