@@ -35,6 +35,9 @@ export default class TopNews extends LightningElement {
     loading = true;
 
     @track
+    error = false;
+
+    @track
     displayTopNews = true;
 
     label = {
@@ -78,7 +81,7 @@ export default class TopNews extends LightningElement {
             this.loading = false;
         } else if (error){
             this.loading = false;
-            this.displayTopNews = false;
+            this.error = true;
             this.errorToastTopNews(error.body.message);
         }
     }

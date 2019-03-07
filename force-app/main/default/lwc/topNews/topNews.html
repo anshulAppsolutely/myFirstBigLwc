@@ -6,6 +6,9 @@
         <template if:false={displayTopNews}>
             <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
         </template>
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-m-around_medium">{label.Error}</div>
+        </template>
         <template if:true={displayTopNews}>
             <c-owlin-logo></c-owlin-logo>
             <div class="lgc-bg">
