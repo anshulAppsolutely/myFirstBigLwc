@@ -23,6 +23,9 @@
             ],
             "c/d3": [
                 "../staticresources/d3/d3.js"
+            ],
+            "c/d3-chart": [
+                "d3Chart/d3Chart.js"
             ]
         }
     },

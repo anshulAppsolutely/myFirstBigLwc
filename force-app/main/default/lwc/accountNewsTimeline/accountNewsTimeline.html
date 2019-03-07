@@ -1,11 +1,8 @@
 <template>
     <lightning-card title={title}>
-        <div class="d3"><svg lwc:dom="manual"></svg></div>
-        <template if:false={displayD3}>
-            <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
-        </template>
-        <template if:true={loading}>
-            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        <template if:true={chartData}>
+            <c-d3-chart title={title} item-color={itemColor} text-color={textColor} period={period}
+            chart-data={chartData} chart-method={chartMethod}></c-d3-chart>
         </template>
     </lightning-card>
 </template>

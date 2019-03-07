@@ -1,25 +1,11 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import D3Asset from '@salesforce/resourceUrl/d3';
-import MomentAsset from '@salesforce/resourceUrl/moment';
 import { NavigationMixin } from 'lightning/navigation';
 import getChartData from '@salesforce/apex/OwlinEntitiesManagementController.getAccountTimeline';
-
 import { showToast } from 'c/utils';
-
-// Labels
-import Error_Title from '@salesforce/label/c.Error_Title';
-import Error_NoData from '@salesforce/label/c.Error_NoData';
-import Chart_Label_Months from '@salesforce/label/c.Chart_Label_Months';
-import Chart_Label_Week from '@salesforce/label/c.Chart_Label_Week';
-
 
 export default class AccountNewsTimeline extends NavigationMixin(LightningElement) {
     @api
     recordId;
-
-    d3Initialized = false;
 
     @api
     title;
@@ -34,108 +20,14 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     period;
 
     @track
-    displayD3 = true;
-
-    @track
     chartData;
 
-    @track
-    loading = true;
-
-    label = {
-        Error_Title,
-        Error_NoData,
-        Chart_Label_Week,
-        Chart_Label_Months
-    };
-
-    /** Get accounts from Apex */
-    @wire(getChartData, { recordId: "$recordId" })
-    wiredResponse({ error, data }) {
-        if (error) {
-            this.errorToast(error.body.message);
-            return;
-        }
-        if (data === undefined) return;
-        if (data.values !== '') {
-            this.chartData = { children: JSON.parse(data.values).reverse() };
-        } else this.chartData = { children: [] };
-        this.renderChart(this);
-    }
-
-    formatData(stats_per_hour) {
-        // Data is retrieved in hourly grouping and re-grouped on defined period using momentjs:
-        let stats_per_day = {}; stats_per_hour.forEach( stat => {
-            let k = moment( stat.stats_at * 1000 ).startOf(this.period).unix();
-            stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
-            stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
-         });
-        return Object.values(stats_per_day);
-    }
-
     /**
-     * ensures that the page loads and renders
-     * the container before the graph is created
+     * Define the logic to build the chart from the available data
      */
-    renderedCallback() {
-        if (this.d3Initialized) {
-            return;
-        }
-        this.d3Initialized = true;
-
-        //load the scripts
-        Promise.all([
-            loadScript(this, D3Asset + '/d3.V5.min.js'),
-            loadScript(this, MomentAsset + '/moment-with-locales.min.js'),
-            loadStyle(this, D3Asset + '/style.css')
-        ]).then(() => {
-            //initialize the graph if data created
-            this.renderChart(this);
-        }).catch(error => {
-            //show error if problem in loading d3
-            this.errorToast(error.message);
-        });
-    }
-
-    showChart() {
-        this.loading = false;
-        this.displayD3 = true;
-        d3.select(this.template.querySelector('div.d3'))
-        .attr("class", 'd3');
-    }
-
-    hideChart() {
-        this.loading = false;
-        this.displayD3 = false;
-        d3.select(this.template.querySelector('div.d3'))
-        .attr("class", 'd3 slds-hide');
-    }
-
-
-
-    renderChart(c) {
-
-        var width, height, svg, margin, x, y, data;
-
-        // bind container object for reference
-        var container = c;
-
-        // Do not render prematurely.
-        if (!this.chartData || typeof(d3) === 'undefined' || !d3 || typeof(moment) === 'undefined' || !moment) return;
-
-        // Only load if there is something to display.
-        if (this.chartData.children.length < 1) {
-            container.hideChart();
-            return;
-        }
-        container.showChart();
-
-        // Set the dimensions and margins of the graph
-        width = d3.select(this.template.querySelector('div.d3')).node().getBoundingClientRect().width; // Resize based on available width
-        height = width * (100 / width); // Fixed aspect
-        margin = { top: 20, right: 20, bottom: 30, left: 40 };
-        width = width - margin.left - margin.right;
-        height = height - margin.top - margin.bottom;
+    @track chartMethod = function(width, height, svg, margin, x, y, container) {
+            
+        var data;
 
         // Set the ranges
         x = d3.scaleBand()
@@ -154,7 +46,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
                 "translate(" + margin.left + "," + margin.top + ")");
 
         // reverse data so that most recent dates are on the right
-        data = container.formatData(this.chartData.children);
+        data = formatData(container.chartData.children);
 
         // Set the range of both axis
         x.domain(data.map(function (d) {
@@ -172,7 +64,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .attr("width", x.bandwidth())
             .attr("y", function (d) { return d.stats && d.stats.all ? y(d.stats.all) : 0; })
             .attr("height", function (d) { return height - (d.stats && d.stats.all ? y(d.stats.all) : 0); })
-            .on('click', function (d) { container.clickAction(d.stats_at) }); // Add onclick action binding
+            .on('click', function (d) { clickAction(d.stats_at) }); // Add onclick action binding
 
         // add the x Axis
         svg.append("g")
@@ -184,11 +76,11 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .attr("class", "yaxis")
             .call(d3.axisLeft(y).tickFormat(d3.format(".0s")).ticks(3));
 
-        // Remove some ticks (we only want whole numbers on this chart)
-        // d3.selectAll('g.yaxis .tick').each(function (d, i) {
-        //     if (d !== Math.round(d))
-        //         d3.select(this).remove()
-        // });
+        //Remove some ticks (we only want whole numbers on this chart)
+        d3.selectAll('g.yaxis .tick').each(function (d, i) {
+            if (d !== Math.round(d))
+                d3.select(this).remove()
+        });
 
         // Build correct output for dates
         // @todo labels (month names + Wk)
@@ -209,21 +101,35 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             // Return month and year
             return monthNames[thisDate.getMonth()] + ' ' + thisDate.getFullYear();
         }
+
+        function formatData(stats_per_hour) {
+            // Data is retrieved in hourly grouping and re-grouped on defined period using momentjs:
+            let stats_per_day = {}; stats_per_hour.forEach( stat => {
+                let k = moment( stat.stats_at * 1000 ).startOf(container.period).unix();
+                stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
+                stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
+             });
+            return Object.values(stats_per_day);
+        }
+
+        // @todo Fire event to navigate Account News to correct timestamp.
+        function clickAction(key) {
+            console.log(key)
+        }
     }
 
-    // @todo Fire event to navigate Account News to correct timestamp.
-    clickAction(key) {
-        //console.log(key)
+    /** Get data from Apex */
+    @wire(getChartData, { recordId: "$recordId" })
+    wiredResponse({ error, data }) {
+        if (error) {
+            this.dispatchEvent(
+                showToast('Error','dismissable', this.title +' - '+ this.label.Error_Title, error.body.message)
+            );
+            return;
+        }
+        if (data === undefined) return;
+        if (data.values !== '') {
+            this.chartData = { children: JSON.parse(data.values).reverse() };
+        } else this.chartData = { children: [] };
     }
-
-    /** 
-     * Show error toast with message 
-     */
-    errorToast(message) {
-        this.dispatchEvent(
-            showToast('Error','dismissable', this.title +' - '+ this.label.Error_Title, message)
-        );
-    }
-
-
 }

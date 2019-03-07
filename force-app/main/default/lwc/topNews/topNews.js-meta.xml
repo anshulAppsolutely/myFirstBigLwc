@@ -2,6 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="topNews">
     <apiVersion>45.0</apiVersion>
     <isExposed>true</isExposed>
+    <masterLabel>Owlin Accounts: Top News</masterLabel>
     <description>Top news for the entities</description>
     <targets>
         <target>lightning__AppPage</target>
