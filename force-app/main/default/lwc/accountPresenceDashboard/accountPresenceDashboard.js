@@ -3,6 +3,11 @@ import { NavigationMixin } from 'lightning/navigation';
 import getAccountForBubble from '@salesforce/apex/OwlinEntitiesManagementController.getAccountForBubble';
 import { showToast } from 'c/utils';
 
+// Labels
+import Error_Title from '@salesforce/label/c.Error_Title';
+import Error_NoData from '@salesforce/label/c.Error_NoData';
+import Error from '@salesforce/label/c.Error';
+
 export default class AccountPresenceDashboard extends NavigationMixin(LightningElement) {
 
     @api
@@ -20,6 +25,15 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
     @track
     chartData;
 
+    @track
+    error = false; 
+
+    label = {
+        Error_Title,
+        Error_NoData,
+        Error
+    };
+
     /** Get accounts from Apex */
     @wire(getAccountForBubble)
     wiredBubbleResponse({ error, data }) {
@@ -29,6 +43,7 @@ export default class AccountPresenceDashboard extends NavigationMixin(LightningE
             this.dispatchEvent(
                 showToast('Error', 'dismissable', this.title + ' - ' + this.label.Error_Title, error.body.message)
             );
+            this.error = true;
         }
     }
 

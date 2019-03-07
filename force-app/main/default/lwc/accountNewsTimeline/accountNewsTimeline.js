@@ -2,6 +2,10 @@ import { LightningElement, api, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getChartData from '@salesforce/apex/OwlinEntitiesManagementController.getAccountTimeline';
 import { showToast } from 'c/utils';
+// Labels
+import Error_Title from '@salesforce/label/c.Error_Title';
+import Error_NoData from '@salesforce/label/c.Error_NoData';
+import Error from '@salesforce/label/c.Error';
 
 export default class AccountNewsTimeline extends NavigationMixin(LightningElement) {
     @api
@@ -24,6 +28,15 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
 
     @track
     chartData;
+
+    @track
+    error = false;
+
+    label = {
+        Error_Title,
+        Error_NoData,
+        Error
+    };
 
     /**
      * Define the logic to build the chart from the available data
@@ -123,6 +136,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             this.dispatchEvent(
                 showToast('Error','dismissable', this.title +' - '+ this.label.Error_Title, error.body.message)
             );
+            this.error = true;
             return;
         }
         if (data === undefined) return;
