@@ -1,5 +1,10 @@
 <apex:page controller="OwlinEntitiesManagementController" lightningStylesheets="true" sidebar="false" showHeader="false" >
     <apex:slds />
+    <style>
+        .errorM3 tr td:first-child, .infoM3 tr td:first-child {
+            width: 2em;
+        }
+    </style>
     <div class="slds-p-around_medium">
         <apex:form >
             <article class="slds-card">
