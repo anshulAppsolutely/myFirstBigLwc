@@ -210,10 +210,11 @@ public with sharing class OwlinEntitiesManagementController {
         System.debug(recordId);
 
         String token;
+        Boolean isTokenNew = false;
         Map<String, Object> response = new Map<String, Object>();
         //check for any filters
         //check backend configurations
-        system.debug('getting timeline from aura >>>');
+        system.debug('getting getAccountTimeline from aura >>>');
         List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
         if (owlinConfigList == null || owlinConfigList.size() == 0) {
             AuraHandledException auraException = new AuraHandledException(Label.Error_NoOwlinConfig);
@@ -232,8 +233,9 @@ public with sharing class OwlinEntitiesManagementController {
         if (owlinConfigList != null && owlinConfigList.size() > 0
                 && owlinConfigList[0] != null
                 && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
-            system.debug('requesting API token from linkAccountsToOwlin');
+            system.debug('requesting API token from getAccountTimeline');
             token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+            isTokenNew = true;
         }
 
         if (token == null) {
@@ -251,7 +253,7 @@ public with sharing class OwlinEntitiesManagementController {
         }
         try{
             String timelineResponse = OwlinEntitiesHandler.getSingleEntityTimeline(owlinConfigList[0], token, recordId);
-            OwlinEntitiesHandler.saveAPIToken(token);
+            if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
             response.put('values', timelineResponse);
             
         }catch(Exception e){

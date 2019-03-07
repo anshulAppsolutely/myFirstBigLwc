@@ -6,6 +6,8 @@ import MomentAsset from '@salesforce/resourceUrl/moment';
 import { NavigationMixin } from 'lightning/navigation';
 import getChartData from '@salesforce/apex/OwlinEntitiesManagementController.getAccountTimeline';
 
+import { showToast } from 'c/utils';
+
 // Labels
 import Error_Title from '@salesforce/label/c.Error_Title';
 import Error_NoData from '@salesforce/label/c.Error_NoData';
@@ -219,11 +221,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
      */
     errorToast(message) {
         this.dispatchEvent(
-            new ShowToastEvent({
-                title: this.label.Error_Title,
-                message: message,
-                variant: 'error'
-            })
+            showToast('Error','dismissable', this.title +' - '+ this.label.Error_Title, message)
         );
     }
 

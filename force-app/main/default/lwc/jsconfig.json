@@ -9,9 +9,6 @@
             "c/account-presence-dashboard": [
                 "accountPresenceDashboard/accountPresenceDashboard.js"
             ],
-            "c/d3": [
-                "../staticresources/d3/d3.js"
-            ],
             "c/account-title": [
                 "accountTitle/accountTitle.js"
             ],
@@ -23,6 +20,9 @@
             ],
             "c/utils": [
                 "utils/utils.js"
+            ],
+            "c/d3": [
+                "../staticresources/d3/d3.js"
             ]
         }
     },
