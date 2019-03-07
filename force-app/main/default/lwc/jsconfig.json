@@ -3,8 +3,23 @@
         "experimentalDecorators": true,
         "baseUrl": ".",
         "paths": {
+            "c/account-news-timeline": [
+                "accountNewsTimeline/accountNewsTimeline.js"
+            ],
             "c/account-presence-dashboard": [
                 "accountPresenceDashboard/accountPresenceDashboard.js"
+            ],
+            "c/account-title": [
+                "accountTitle/accountTitle.js"
+            ],
+            "c/relative-date-time": [
+                "relativeDateTime/relativeDateTime.js"
+            ],
+            "c/top-news": [
+                "topNews/topNews.js"
+            ],
+            "c/utils": [
+                "utils/utils.js"
             ],
             "c/d3": [
                 "../staticresources/d3/d3.js"

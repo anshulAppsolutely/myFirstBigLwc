@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="accountNewsTimeline">
+    <apiVersion>45.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Owlin Account News Timeline</masterLabel>
+    <description>Timeline chart containing news data for account</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+          <property name="itemColor" type="String" default="#1f77b4"  label="Item Colour"/>
+          <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
+          <property name="title" type="String" default="Owlin News Timeline" label="Title" />
+          <property name="period" type="String" default="day" label="Owlin Default Period" description="Enter day, week or month" />
+      </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>
