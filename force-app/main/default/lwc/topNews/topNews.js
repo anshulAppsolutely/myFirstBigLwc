@@ -35,6 +35,9 @@ export default class TopNews extends LightningElement {
     loading = true;
 
     @track
+    error = false;
+
+    @track
     displayTopNews = true;
 
     label = {
@@ -66,9 +69,8 @@ export default class TopNews extends LightningElement {
     /** Get accounts from Apex */
     @wire(getTopNewsData, {filter: '$topNewsKey'})
     wiredTopNewsResponse({ error, data }) {
-        console.log('data  in top news>'+data);
         if (data) {
-            if (data === undefined || data.values.length == 0)
+            if (data === undefined || data.values.length === 0)
             {
                 this.displayTopNews = false;
             } else {
@@ -78,8 +80,8 @@ export default class TopNews extends LightningElement {
             }
             this.loading = false;
         } else if (error){
-            this.loading = true;
-            this.displayTopNews = true;
+            this.loading = false;
+            this.error = true;
             this.errorToastTopNews(error.body.message);
         }
     }

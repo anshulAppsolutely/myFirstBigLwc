@@ -6,10 +6,11 @@
         <template if:false={displayTopNews}>
             <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
         </template>
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-m-around_medium">{label.Error}</div>
+        </template>
         <template if:true={displayTopNews}>
-            <div>
-                <img class="owlin-image" src={poweredBy}>
-            </div>
+            <c-owlin-logo></c-owlin-logo>
             <div class="lgc-bg">
                 <ul class="slds-has-dividers_bottom-space">
                     <template for:each={topNewsServer} for:item="topNewsItem">
