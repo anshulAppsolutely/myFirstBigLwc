@@ -70,7 +70,7 @@ export default class TopNews extends LightningElement {
     @wire(getTopNewsData, {filter: '$topNewsKey'})
     wiredTopNewsResponse({ error, data }) {
         if (data) {
-            if (data === undefined || data.values.length === 0)
+            if (data === undefined || data.values === undefined || data.values.length === 0)
             {
                 this.displayTopNews = false;
             } else {

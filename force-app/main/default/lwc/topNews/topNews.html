@@ -1,5 +1,6 @@
 <template>
     <lightning-card title={topNewstitle}>
+        <c-owlin-logo></c-owlin-logo>
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </template>
@@ -10,7 +11,6 @@
             <div class="slds-text-color_error slds-m-around_medium">{label.Error}</div>
         </template>
         <template if:true={displayTopNews}>
-            <c-owlin-logo></c-owlin-logo>
             <div class="lgc-bg">
                 <ul class="slds-has-dividers_bottom-space">
                     <template for:each={topNewsServer} for:item="topNewsItem">
