@@ -1,0 +1,20 @@
+<template>
+    <lightning-card title={title}>
+        <template if:true={accountNewsData}>
+            <div style="height: 200px;">
+                <lightning-datatable
+                    data={accountNewsData}
+                    columns={columns}
+                    key-field="key"
+                    hide-checkbox-column="true"
+                    hide-table-header="true"
+                    enable-infinite-loading
+                    load-more-offset=20
+                    onloadmore={handleLoadMore}
+                    >
+                </lightning-datatable>
+            </div>
+            {loadMoreStatus}
+        </template>
+    </lightning-card>
+</template>

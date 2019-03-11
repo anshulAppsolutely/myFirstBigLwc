@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="accountNews">
+    <apiVersion>45.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Owlin Account News</masterLabel>
+    <description>News data for account</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+          <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
+          <property name="title" type="String" default="Owlin Account News" label="Title" />
+          <property name="filter" type="String" default="all" label="Owlin Default Theme" description="Enter all, or appropriate theme" />
+      </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

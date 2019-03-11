@@ -3,6 +3,9 @@
         "experimentalDecorators": true,
         "baseUrl": ".",
         "paths": {
+            "c/account-news": [
+                "accountNews/accountNews.js"
+            ],
             "c/account-news-timeline": [
                 "accountNewsTimeline/accountNewsTimeline.js"
             ],
@@ -11,6 +14,12 @@
             ],
             "c/account-title": [
                 "accountTitle/accountTitle.js"
+            ],
+            "c/d3-chart": [
+                "d3Chart/d3Chart.js"
+            ],
+            "c/owlin-logo": [
+                "owlinLogo/owlinLogo.js"
             ],
             "c/relative-date-time": [
                 "relativeDateTime/relativeDateTime.js"
@@ -23,12 +32,6 @@
             ],
             "c/d3": [
                 "../staticresources/d3/d3.js"
-            ],
-            "c/d3-chart": [
-                "d3Chart/d3Chart.js"
-            ],
-            "c/owlin-logo": [
-                "owlinLogo/owlinLogo.js"
             ]
         }
     },
