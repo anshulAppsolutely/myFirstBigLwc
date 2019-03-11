@@ -29,6 +29,9 @@
             ],
             "c/owlin-logo": [
                 "owlinLogo/owlinLogo.js"
+            ],
+            "c/account-presence-matrix": [
+                "accountPresenceMatrix/accountPresenceMatrix.js"
             ]
         }
     },
