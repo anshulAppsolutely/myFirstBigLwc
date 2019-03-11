@@ -1,4 +1,4 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 
 export default class AccountTitle extends NavigationMixin(LightningElement) {

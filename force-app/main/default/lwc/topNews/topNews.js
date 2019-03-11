@@ -99,4 +99,29 @@ export default class TopNews extends LightningElement {
         );
     }
 
+    openmodaltodisplay(event){
+        console.log('in open modal top news');
+        var message = event.message;
+        if(message!=undefined && message!=null) {
+            let parcedValue = message.split('$$');
+            let value = parcedValue[0];
+            let label = parcedValue[1];
+            console.log('label >>>' + label);
+            console.log('value >>>' + value);
+            switch (label) {
+                case "Email":
+                    //set the value of message
+                    this.template.querySelector('c-email-modal').emailMessage = value;
+                    //open modal
+                    this.template.querySelector('c-email-modal').openEmail();
+                    break;
+                case "Post":
+                    console.log('in am in post');
+                    break;
+            }
+        }
+
+
+    }
+
 }

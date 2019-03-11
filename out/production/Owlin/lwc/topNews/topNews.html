@@ -17,7 +17,7 @@
                             <li key={topNewsItem.key} class="slds-item">
                                 <lightning-tile href="#" type="media">
                                     <c-account-title accounts-list={accounts} entity-id={topNewsItem.timeline} title-color={accountTitleColor}></c-account-title>
-                                    <c-menu-buttons value={topNewsItem.props.url} onopenmodaltopnews={openmodaltodisplay}></c-menu-buttons>
+                                    <c-menu-buttons value={topNewsItem.props.url} onopenmodaltopnews= {openmodaltodisplay}></c-menu-buttons>
                                     <div class="slds-truncate">
                                         <span><a style={headerColorToDisplay} href={topNewsItem.props.url} target=_blank>{topNewsItem.props.header}</a></span>
                                     </div>
