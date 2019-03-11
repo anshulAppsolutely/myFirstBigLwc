@@ -41,8 +41,8 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     /**
      * Define the logic to build the chart from the available data
      */
-    @track chartMethod = function(width, height, svg, container) {
-            
+    @track chartMethod = function (width, height, svg, container) {
+
         var data, x, y, margin;
 
         margin = { top: 20, right: 20, bottom: 30, left: 40 };
@@ -55,7 +55,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .padding(0.1);
         y = d3.scaleLinear()
             .range([height, 0]);
-        
+
         // Build container svg
         svg = d3.select(this.template.querySelector('div.d3 svg'))
             .html("")
@@ -83,7 +83,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
             .attr("x", function (d) { return x(getXLabel(d)); })
             .attr("width", x.bandwidth())
             .attr("y", function (d) { return d.stats && d.stats.all ? y(d.stats.all) : 0; })
-            .attr("height", function (d) { return height - (d.stats && d.stats.all ? y(d.stats.all) : 0); })
+            .attr("height", function (d) { return (d.stats && d.stats.all ? height - y(d.stats.all) : 0); })
             .on('click', function (d) { clickAction(d.stats_at) }); // Add onclick action binding
 
         // add the x Axis
@@ -105,22 +105,38 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
         // Build correct output for dates
         function getXLabel(d) {
             if (container.chartFilter === 'week') {
-                return container.label.Chart_Label_Week + ' ' + moment(d.stats_at * 1000 ).startOf(container.chartFilter).week();
+                return container.label.Chart_Label_Week + ' ' + moment(d.stats_at * 1000).startOf(container.chartFilter).week();
             }
             if (container.chartFilter === 'day') // get day and month
                 return moment(d.stats_at * 1000).startOf(container.chartFilter).format('D MMM');
             // Return month and year
-            return moment(d.stats_at * 1000).startOf(container.chartFilter).format('MMM YY');
+            return moment(d.stats_at * 1000).startOf(container.chartFilter).format('MMM');
         }
 
         function formatData(stats_per_hour) {
             // Data is retrieved in hourly grouping and re-grouped on defined period using momentjs:
-            let stats_per_day = {}; stats_per_hour.forEach( stat => {
-                let k = moment( stat.stats_at * 1000 ).startOf(container.chartFilter).unix();
-                stats_per_day[k] = stats_per_day[k] || {"stats_at" : k, "stats": {"all" : 0}};
+            let stats_per_day = {};
+            stats_per_hour.forEach(stat => {
+                let k = moment(stat.stats_at * 1000).startOf(container.chartFilter).unix();
+                stats_per_day[k] = stats_per_day[k] || { "stats_at": k, "stats": { "all": 0 } };
                 stats_per_day[k].stats.all += (stat.stats && stat.stats.all ? stat.stats.all : 0);
-             });
-            return Object.values(stats_per_day).slice(0,container.chartLimit);
+            });
+
+            let from = stats_per_hour[0].stats_at;
+            let to = moment().unix();
+
+            // fill out the zero's (useful for line charts)
+            let zeroFilled = [];    
+            let cursor = moment( from * 1000 ).startOf(container.chartFilter).unix();
+            while( cursor <= to ){
+                zeroFilled.push({
+                    stats_at: cursor,
+                    stats: (stats_per_day[cursor] && stats_per_day[cursor].stats ?stats_per_day[cursor].stats : {all: 0})
+                });
+                cursor = moment(cursor * 1000).add(1,container.chartFilter).unix();
+            }
+
+            return zeroFilled.slice(zeroFilled.length - container.chartLimit);
         }
 
         // @todo Fire event to navigate Account News to correct timestamp.
@@ -134,7 +150,7 @@ export default class AccountNewsTimeline extends NavigationMixin(LightningElemen
     wiredResponse({ error, data }) {
         if (error) {
             this.dispatchEvent(
-                showToast('Error','dismissable', this.title +' - '+ this.label.Error_Title, error.body.message)
+                showToast('Error', 'dismissable', this.title + ' - ' + this.label.Error_Title, error.body.message)
             );
             this.error = true;
             return;
