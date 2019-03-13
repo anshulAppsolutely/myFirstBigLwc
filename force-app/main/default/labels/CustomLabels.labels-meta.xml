@@ -50,6 +50,13 @@
         <value>Request failed. Token not received</value>
     </labels>
     <labels>
+        <fullName>Error_ChatterMsg</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error_ChatterMsg</shortDescription>
+        <value>You haven&#39;t fill to share..!!</value>
+    </labels>
+    <labels>
         <fullName>Error_EntitiesLicense</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -188,6 +195,20 @@
         <protected>true</protected>
         <shortDescription>header_OwlinEntityManager</shortDescription>
         <value>Owlin Entity Management</value>
+    </labels>
+    <labels>
+        <fullName>labelChatterPost</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>labelChatterPost</shortDescription>
+        <value>Post</value>
+    </labels>
+    <labels>
+        <fullName>labelEmail</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>labelEmail</shortDescription>
+        <value>Email</value>
     </labels>
     <labels>
         <fullName>link_RequestAllowance</fullName>
