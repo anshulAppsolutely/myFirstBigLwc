@@ -100,24 +100,31 @@ export default class TopNews extends LightningElement {
     }
 
     openmodaltodisplay(event){
-        console.log('in open modal top news');
-        var message = event.message;
+        console.log(' in top news'+event.detail);
+        const message = event.detail;
         if(message!=undefined && message!=null) {
-            let parcedValue = message.split('$$');
-            let value = parcedValue[0];
-            let label = parcedValue[1];
-            console.log('label >>>' + label);
-            console.log('value >>>' + value);
-            switch (label) {
-                case "Email":
-                    //set the value of message
-                    this.template.querySelector('c-email-modal').emailMessage = value;
-                    //open modal
-                    this.template.querySelector('c-email-modal').openEmail();
-                    break;
-                case "Post":
-                    console.log('in am in post');
-                    break;
+            const parcedValue = message.split('$$');
+            if (parcedValue != null && parcedValue.length > 0) {
+                const value = parcedValue[0];
+                const labelWithHeader = parcedValue[1].split('@@');
+                const label = labelWithHeader[0];
+                const subjectVal = labelWithHeader[1];
+                switch (label) {
+                    case "Email":
+                        //set the value of message
+                        this.template.querySelector('c-email-modal').emailMessage = value;
+                        this.template.querySelector('c-email-modal').subject = subjectVal;
+                        //open modal
+                        this.template.querySelector('c-email-modal').openEmail();
+                        break;
+                    case "Post":
+                        console.log('in am in post');
+                        this.template.querySelector('c-chatter-post-modal').postMessage = value;
+                        this.template.querySelector('c-chatter-post-modal').headline = subjectVal;
+                        //open modal
+                        this.template.querySelector('c-chatter-post-modal').openChatter();
+                        break;
+                }
             }
         }
 

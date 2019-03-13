@@ -5,31 +5,27 @@ export default class MenuButtons extends LightningElement {
     @api
     value;
 
+    @api
+    subject;
+
     get emailVal(){
-        return this.value+'$$Email';
+        return this.value+'$$Email@@'+this.subject;
     }
 
     get postVal(){
-        return this.value+'$$Post';
+        return this.value+'$$Post@@'+this.subject;
     }
 
     get taskVal(){
-        return this.value+'$$Task';
+        return this.value+'$$Task@@'+this.subject;
     }
 
     handleButtonselect(event) {
         event.preventDefault();
-        console.log('in menu items >>'+event.detail.value);
-        let message = event.detail.value;
-        console.log('message  >>'+message+' this val  >>'+this.value);
-        console.log(typeof message);
+        const message = event.detail.value;
         if(message!=undefined && message!=null) {
-            let parcedValue = message.split('$$');
-            let value = parcedValue[0];
-            let label = parcedValue[1];
-            console.log('before event >>>'+value+' label >>'+label);
             this.dispatchEvent(
-                new CustomEvent('openmodaltopnews', {message: message})
+                new CustomEvent('openmodaltopnews', {detail: message})
             );
         }
     }

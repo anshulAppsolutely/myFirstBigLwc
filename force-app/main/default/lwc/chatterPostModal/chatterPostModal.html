@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <template if:true={openmodel}>
+        <template if:true={opeChatterModel}>
             <div class="demo-only" style="height: 640px;" >
                 <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                     <div class="slds-modal__container">
@@ -9,22 +9,21 @@
                                 <lightning-icon icon-name="utility:close" size="medium"></lightning-icon>
                                 <span class="slds-assistive-text">Close</span>
                             </button>
-                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.labelEmail}</h2>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.labelChatterPost}</h2>
                         </header>
                         <div class="slds-modal__content slds-p-around_medium">
-                            <lightning-input type="email" value={email} name="input1" label="Email" required onkeyup={handleEmailKeyUp}></lightning-input>
-                            <lightning-input type="text" value={subject} name="input2" label="Subject" onkeyup={handleSubjectKeyUp}></lightning-input>
-                            &nbsp;&nbsp;
                             <lightning-input-rich-text
-                                    value={emailMessage}
-                                    label="Message"
-                                    formats=[font,size,bold,italic,underline,indent,align,link,clean,list,table,header,color]
-                                    onkeyup={handleBodyKeyUp}>
+                                    value={postMessage}
+                                    label="postMessage"
+                                    message-when-bad-input={errorMessage}
+                                    valid={validity}
+                                    formats=[font,size,bold,italic,underline,list,table,header]
+                                    onkeyup={handleChatterKeyUp}>
                             </lightning-input-rich-text>
                         </div>
                         <footer class="slds-modal__footer">
                             <lightning-button label="Cancel" variant="neutral" onclick={closeModal}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <lightning-button label="Send" variant="brand" onclick={sendEmail}></lightning-button>
+                            <lightning-button label="Share" variant="brand" onclick={postChat}></lightning-button>
                         </footer>
                     </div>
                 </section>

@@ -146,7 +146,7 @@ public with sharing class OwlinEntitiesHandler {
      */
     public static String getSingleEntityTimeline(final Configuration_Settings__c owlinConfig, String token, Id recordId){
         String timeLineResponse = null;
-        
+
         if(owlinConfig!=null) {
             try {
                 //get all owlin entity that are required
@@ -154,10 +154,10 @@ public with sharing class OwlinEntitiesHandler {
                 List<Account> account = [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Id = :recordId];
-                
+
                 if (account[0].Owlin_Entity_Id__c == null) return '';
 
-            
+
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
                 String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/stats/hour';

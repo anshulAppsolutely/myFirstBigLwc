@@ -8,6 +8,7 @@
 public with sharing class OwlinEntitiesManagementController {
 
     //private String
+    private final static Integer MAX_RESULTS = 25;
     private static Map<String, Map<string, List<String>>> accessMapByrecordName = new Map<String, Map<String, List<String>>> {
 
             'Account' => new Map<String, List<String>> {
@@ -255,7 +256,7 @@ public with sharing class OwlinEntitiesManagementController {
             String timelineResponse = OwlinEntitiesHandler.getSingleEntityTimeline(owlinConfigList[0], token, recordId);
             if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
             response.put('values', timelineResponse);
-            
+
         }catch(Exception e){
             AuraHandledException auraException = new AuraHandledException(Label.Error);
             auraException.setMessage(Label.Error);
@@ -410,5 +411,93 @@ public with sharing class OwlinEntitiesManagementController {
             }
         }
         return topNewRequest;
+    }
+
+    @AuraEnabled(Cacheable=true)
+    public static List<String> search(String searchTerm) {
+        // Prepare query paramters
+        searchTerm += '*';
+        system.debug('searchTerm  >'+searchTerm);
+
+        // Execute search query
+        List<List<SObject>> searchResults = [FIND :searchTerm IN ALL FIELDS RETURNING
+                User (Id, Name, Email ),
+                Contact (Id, Name, Email)
+        LIMIT :MAX_RESULTS];
+
+        system.debug('searchResults  >'+searchResults);
+
+        // Prepare results
+        List<String> results = new List<String>();
+
+        // Extract User
+        User [] users = ((List<User>) searchResults[0]);
+        for (User u : users) {
+            results.add(u.Email);
+        }
+
+        // Extract Contact
+        Contact [] contacts = ((List<Contact>) searchResults[1]);
+        for (Contact contact : contacts) {
+            results.add(contact.Email);
+        }
+
+        return results;
+    }
+
+    @AuraEnabled
+    public static Boolean sendMailMethod(String mSubject, String mbody, string recid){
+        Boolean emailSent = false;
+        try {
+            Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
+            message.toAddresses = new String[]{
+                    recid
+            };
+            message.optOutPolicy = 'FILTER';
+            message.subject = mSubject;
+            message.htmlBody = mbody;
+            Messaging.SingleEmailMessage[] messages = new List<Messaging.SingleEmailMessage>{
+                    message
+            };
+            Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
+
+            if (results[0].success) {
+                System.debug('The email was sent successfully.');
+                emailSent = true;
+            } else {
+                System.debug('The email failed to send: ' + results[0].errors[0].message);
+                AuraHandledException auraException = new AuraHandledException(results[0].errors[0].message);
+                auraException.setMessage(results[0].errors[0].message);
+                throw auraException;
+            }
+            return emailSent;
+        }catch (Exception e){
+            System.debug('exception in sending email >>'+e.getMessage());
+            AuraHandledException auraException = new AuraHandledException(e.getMessage());
+            auraException.setMessage(e.getMessage());
+            throw auraException;
+        }
+
+    }
+
+    @AuraEnabled
+    public static Boolean postChatter(String postMessage){
+
+        Boolean postSuccess = false;
+        try {
+            FeedItem post = new FeedItem();
+            post.ParentId = UserInfo.getUserId();
+            post.body = postMessage;
+            post.IsRichText = true;
+            post.Type = 'TextPost';
+            insert post;
+            return true;
+        }catch (Exception e){
+            System.debug('exception in sending email >>'+e.getMessage());
+            AuraHandledException auraException = new AuraHandledException(e.getMessage());
+            auraException.setMessage(e.getMessage());
+            throw auraException;
+        }
+
     }
 }
