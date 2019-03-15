@@ -11,6 +11,7 @@
       <targetConfig targets="lightning__RecordPage">
           <property name="textColor" type="String" default="#ffffff" label="Text Colour" />
           <property name="title" type="String" default="Owlin Account News" label="Title" />
+          <property name="tagColor" type="String" default="#1f77b4"  label="Tag Colour"/>
           <property name="filter" type="String" default="all" label="Owlin Default Theme" description="Enter all, or appropriate theme" />
       </targetConfig>
   </targetConfigs>

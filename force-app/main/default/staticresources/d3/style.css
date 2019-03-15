@@ -8,3 +8,22 @@ svg.d3 .nodes circle {
     stroke-width: 1.5px;
 }
 
+.datatable table td.owlin-keywords lightning-formatted-text {
+    background-color: #1f77b4;
+    font-weight: 600;
+    font-size: 12px;
+    color: white;
+    padding: 2px 0px 2px 0px;
+}
+
+.datatable span.slds-truncate {
+    line-height: 28px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize!important;
+}
+
+.datatable button.slds-button.slds-button_icon-bare {
+    display: none;
+}
+

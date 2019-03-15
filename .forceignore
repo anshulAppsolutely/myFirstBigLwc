@@ -7,3 +7,5 @@ package.xml
 
 **/.eslintrc.json
 **__tests**
+force-app/main/default/flexipages/Test_LWC.flexipage-meta.xml
+force-app/main/default/flexipages/Account_Record_Page1.flexipage-meta.xml

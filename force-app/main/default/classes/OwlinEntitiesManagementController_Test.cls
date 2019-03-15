@@ -280,7 +280,7 @@ private class OwlinEntitiesManagementController_Test {
             insert toInsertCustomSettingRecList;
             List<Account> requestedAccount = [Select id, name from account where Owlin_Entity_Id__c!=null limit 1];
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getSingleEntityTimeline'));
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'entityTimeline'));
             try {
                 Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountTimeline(requestedAccount[0].id);
                 System.assert(timelineResponse!=null);
@@ -308,13 +308,59 @@ private class OwlinEntitiesManagementController_Test {
             configProd.Token_Expiry_Date__c = System.Today().addDays(2);
             toInsertCustomSettingRecList.add(configProd);
             insert toInsertCustomSettingRecList;
-            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'getSingleEntityTimeline'));
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'entityTimeline'));
             List<Account> requestedAccount = [Select id, name from account where Owlin_Entity_Id__c!=null limit 1];
             Test.startTest();
             try {
                 Map<String, Object> timelineResponse = OwlinEntitiesManagementController.getAccountTimeline(requestedAccount[0].id);
             } catch (Exception e) {
                 System.assertEquals(Label.Owlin_Permission_Error, e.getMessage());
+            }
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void testAccountNews() {
+        //create custom setting test data
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
+            list<Configuration_Settings__c> toInsertCustomSettingRecList = new list<Configuration_Settings__c>();
+            Configuration_Settings__c configProd = new Configuration_Settings__c();
+            configProd.Name = 'Test_Owlin';
+            configProd.Email__c = 'test@test.com';
+            configProd.Endpoint__c = 'api.test.owlin/v1/';
+            configProd.Password__c = 'testPassword';
+            configProd.Is_Primary__c = true;
+            configProd.Token__c = 'testToken';
+            configProd.Token_Expiry_Date__c = System.Today().addDays(2);
+            toInsertCustomSettingRecList.add(configProd);
+            insert toInsertCustomSettingRecList;
+            List<Account> requestedAccount = [Select id, name from account where Owlin_Entity_Id__c!=null limit 1];
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'entityNewsTestEndPoint'));
+            try {
+                Map<String, Object> accountNews = OwlinEntitiesManagementController.getAccountNews(requestedAccount[0].id, 0, 'all');
+                System.assert(accountNews!=null);
+                String news = (String)accountNews.get('values');
+                System.assert(news!=null);
+            } catch (Exception e) {
+
+            }
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void testAccountNewsConfigException() {
+        system.runAs(OwlinTestUtils.getOwlinUserWithPermission()) {
+            List<Account> requestedAccount = [Select id, name from account where Owlin_Entity_Id__c!=null limit 1];
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200,'entityNewsTestEndPoint'));
+            try {
+                OwlinEntitiesManagementController.getAccountNews(requestedAccount[0].id, 0, 'all');
+            } catch (Exception e) {
+                System.assert(e.getMessage()!=null);
+                System.assertEquals(Label.Error_NoOwlinConfig, e.getMessage());
             }
             Test.stopTest();
         }

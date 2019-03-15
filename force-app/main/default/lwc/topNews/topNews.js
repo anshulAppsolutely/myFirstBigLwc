@@ -1,5 +1,5 @@
 import { LightningElement, track , api, wire} from 'lwc';
-import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import { loadScript } from 'lightning/platformResourceLoader';
 import getTopNewsData from '@salesforce/apex/OwlinEntitiesManagementController.getTopNewsData';
 import MomentAsset from '@salesforce/resourceUrl/moment';
 // Labels

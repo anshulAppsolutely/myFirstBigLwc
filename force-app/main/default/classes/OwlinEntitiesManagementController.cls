@@ -263,6 +263,71 @@ public with sharing class OwlinEntitiesManagementController {
         }
         return response;
     }
+
+
+    /**
+     * this method is used to get the news of a single account backwards
+     *
+     * @param recordId
+     *
+     * @return
+     */
+    @AuraEnabled(cacheable=true)
+    public static Map<String, Object> getAccountNews(Id recordId, Integer recordLimit, String filter) {
+        System.debug('recordId');
+        System.debug(recordId);
+        String token;
+        Boolean isTokenNew = false;
+        Map<String, Object> response = new Map<String, Object>();
+        //check for any filters
+        //check backend configurations
+        system.debug('getting getAccountNews from aura >>>');
+        List<Configuration_Settings__c> owlinConfigList = OwlinEntitiesHandler.getRequestedConfiguration(null);
+        if (owlinConfigList == null || owlinConfigList.size() == 0) {
+            AuraHandledException auraException = new AuraHandledException(Label.Error_NoOwlinConfig);
+            auraException.setMessage(Label.Error_NoOwlinConfig);
+            throw auraException;
+        }
+        Date today = System.Today();
+        if (owlinConfigList != null && owlinConfigList.size() > 0
+                && owlinConfigList[0] != null
+                && owlinConfigList[0].Token__c != null
+                && owlinConfigList[0].Token_Expiry_Date__c > today) {
+            token = owlinConfigList[0].Token__c;
+        } else {
+            //check for valid token or expiry
+            //if token is not valid get the new token first
+            system.debug('requesting API token from getAccountNews');
+            token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
+            isTokenNew = true;
+        }
+
+        if (token == null) {
+            AuraHandledException auraException = new AuraHandledException(Label.Error_APITokenError);
+            auraException.setMessage(Label.Error_APITokenError);
+            throw auraException;
+        }
+        //check whether user has permission to read account object
+        try{
+            OwlinDMLManager.checkAccess(accessMapByrecordName);
+        }catch(Exception e){
+            AuraHandledException auraException = new AuraHandledException(Label.Owlin_Permission_Error);
+            auraException.setMessage(Label.Owlin_Permission_Error);
+            throw auraException;
+        }
+        try{
+            String entityNews = OwlinEntitiesHandler.getSingleEntityNews(owlinConfigList[0], token, recordId, recordLimit, filter);
+            if(isTokenNew) OwlinEntitiesHandler.saveAPIToken(token);
+            response.put('values', entityNews);
+
+        }catch(Exception e){
+            AuraHandledException auraException = new AuraHandledException(Label.Error);
+            auraException.setMessage(Label.Error);
+            throw auraException;
+        }
+        return response;
+    }
+
     /**
      * this method is used to get the topnews data
      * the request is created from bubble data with entities as keys as list of article ids
@@ -293,12 +358,9 @@ public with sharing class OwlinEntitiesManagementController {
                     && owlinConfigList[0].Token__c != null
                     && owlinConfigList[0].Token_Expiry_Date__c > today) {
                 token = owlinConfigList[0].Token__c;
-            }
-            //check for valid token or expiry
-            //if token is not valid get the new token first
-            if (owlinConfigList != null && owlinConfigList.size() > 0
-                    && owlinConfigList[0] != null
-                    && (owlinConfigList[0].Token__c == null || owlinConfigList[0].Token_Expiry_Date__c < today)) {
+            } else {
+                //check for valid token or expiry
+                //if token is not valid get the new token first
                 system.debug('requesting API token from getTopNewsData');
                 token = OwlinEntitiesHandler.requestAPIToken(owlinConfigList[0]);
                 isTokenNew = true;

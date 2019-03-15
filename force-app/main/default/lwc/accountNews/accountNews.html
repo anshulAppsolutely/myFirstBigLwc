@@ -1,20 +1,29 @@
 <template>
-    <lightning-card title={title}>
-        <template if:true={accountNewsData}>
-            <div style="height: 200px;">
-                <lightning-datatable
-                    data={accountNewsData}
-                    columns={columns}
-                    key-field="key"
-                    hide-checkbox-column="true"
-                    hide-table-header="true"
-                    enable-infinite-loading
-                    load-more-offset=20
-                    onloadmore={handleLoadMore}
-                    >
-                </lightning-datatable>
-            </div>
-            {loadMoreStatus}
-        </template>
-    </lightning-card>
+    <div class="datatable">
+        <lightning-card title={title}>
+            <template if:false={displayEntityNews}>
+                <div class="slds-text-color_error slds-m-around_medium">{label.Error_NoData}</div>
+            </template>
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-m-around_medium">{label.Error}</div>
+            </template>
+            <template if:true={displayEntityNews}>
+                <div style="height: 200px;">
+                    <lightning-datatable
+                        data={accountNewsData}
+                        columns={columns}
+                        key-field="key"
+                        hide-checkbox-column="true"
+                        enable-infinite-loading
+                        load-more-offset=20
+                        onloadmore={loadMoreData}
+                        >
+                    </lightning-datatable>
+                </div>
+            </template>
+            <template if:true={loading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+        </lightning-card>
+    </div>
 </template>

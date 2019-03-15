@@ -146,7 +146,7 @@ public with sharing class OwlinEntitiesHandler {
      */
     public static String getSingleEntityTimeline(final Configuration_Settings__c owlinConfig, String token, Id recordId){
         String timeLineResponse = null;
-        
+
         if(owlinConfig!=null) {
             try {
                 //get all owlin entity that are required
@@ -154,10 +154,10 @@ public with sharing class OwlinEntitiesHandler {
                 List<Account> account = [SELECT
                         Id, Name, Owlin_Entity_Id__c
                 FROM Account WHERE Id = :recordId];
-                
+
                 if (account[0].Owlin_Entity_Id__c == null) return '';
 
-            
+
                 HttpResponse httpResponse;
                 HttpClient client = new HttpClient();
                 String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/stats/hour';
@@ -176,6 +176,44 @@ public with sharing class OwlinEntitiesHandler {
         return timeLineResponse;
     }
 
+    /**
+     * get the entity news
+     *
+     * @return boolean
+     */
+    public static String getSingleEntityNews(final Configuration_Settings__c owlinConfig, String token, Id recordId, Integer recordLimit, String filter){
+        String singleEntityNews = null;
+        Integer requestedLimit = 100;
+        system.debug('recordLimit >>'+recordLimit+'record id >>>'+recordId);
+        if(recordLimit!=null && recordLimit  > 0)  requestedLimit = recordLimit;
+
+        if(owlinConfig!=null) {
+            try {
+                //get all owlin entity that are required
+                Set<String> keys = new Set<String>();
+                List<Account> account = [SELECT
+                        Id, Name, Owlin_Entity_Id__c
+                FROM Account WHERE Id = :recordId];
+
+                if (account[0].Owlin_Entity_Id__c == null) return '';
+
+                HttpResponse httpResponse;
+                HttpClient client = new HttpClient();
+                String endpointString = (owlinConfig.Endpoint__c.indexOf('https')!= -1 ? owlinConfig.Endpoint__c: 'https://' + owlinConfig.Endpoint__c) + 'jobs/salesforce/versions/production/timelines/' + account[0].Owlin_Entity_Id__c + '/backwards/'+ filter +'?limit='+requestedLimit;
+                if(Test.isRunningTest()) endpointString = 'entityNewsTestEndPoint';
+                client.get(endpointString, token!=null ? token: owlinConfig.Token__c);
+                httpResponse = client.getHttpResponse();
+                if(httpResponse!=null) {
+                    singleEntityNews = httpResponse.getBody();
+                    system.debug('singleEntityNews >>'+singleEntityNews);
+                }
+            } catch (Exception e) {
+                System.debug(LoggingLevel.DEBUG, '***** Error:while getting singleEntityNews ' + e.getMessage());
+                throw e;
+            }
+        }
+        return singleEntityNews;
+    }
 
     /**
      * prepare requesting API token
